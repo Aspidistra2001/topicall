@@ -1,0 +1,780 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>TopiCall, le terrain</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concept : un jeu de plans. Carte de France -> immeuble -> plan d'étage -> salle. Trait de plan d'architecte, un seul accent orange pour « vous êtes ici ». */
+:root{
+  --bg:#f1f4f9; --surface:#ffffff; --ink:#15233b; --muted:#56637f; --line:#c8d2e3;
+  --plan:#2b4c9b; --plan-fill:#e7edf9; --accent:#c2410c; --accent-soft:#fdebdf;
+  --good:#18794e; --good-soft:#e2f4ea; --bad:#b4232c; --bad-soft:#fbe6e7;
+  --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+  --body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d162e; --surface:#162243; --ink:#e7ecf8; --muted:#a1b1d3; --line:#2d3d68;
+  --plan:#9db8ff; --plan-fill:#1b2a54; --accent:#ff9c5b; --accent-soft:#3a2416;
+  --good:#5fd39b; --good-soft:#12352a; --bad:#ff8f8f; --bad-soft:#3d1a1e; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d162e; --surface:#162243; --ink:#e7ecf8; --muted:#a1b1d3; --line:#2d3d68;
+  --plan:#9db8ff; --plan-fill:#1b2a54; --accent:#ff9c5b; --accent-soft:#3a2416;
+  --good:#5fd39b; --good-soft:#12352a; --bad:#ff8f8f; --bad-soft:#3d1a1e; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:920px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:700}
+h2{font-size:1.5rem;font-weight:700}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0}
+a{color:var(--plan)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:700;font-size:1.05rem;text-decoration:none;color:var(--ink)}
+.brand i{font-style:normal;color:var(--accent)}
+.crumb{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:0}
+.prog{margin-left:auto;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+main{padding-block:24px 64px;display:flex;flex-direction:column;gap:28px}
+section.view{display:flex;flex-direction:column;gap:24px}
+
+.lede{max-width:62ch;color:var(--muted);font-size:1.05rem}
+.facts{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--mono);font-size:.82rem;color:var(--muted);padding:0;margin:0;list-style:none}
+.facts b{color:var(--ink);font-weight:500}
+
+.intro{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+@media (max-width:720px){.intro{grid-template-columns:minmax(0,1fr)}}
+.intro>div{display:flex;flex-direction:column;gap:12px;min-width:0}
+.intro ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:8px;max-width:62ch}
+.intro .src{font-size:.82rem;color:var(--muted)}
+.vid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);text-decoration:none;color:var(--ink)}
+.vid:hover{border-color:var(--accent)}
+.vid::before{content:"";grid-row:span 2;width:0;height:0;border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent var(--accent);margin:0 6px 0 8px}
+.vid b{font-family:var(--display)}
+.vid small{grid-column:2;color:var(--muted);font-size:.85rem}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:720px){.mapgrid{grid-template-columns:minmax(0,1fr)}}
+:root{--fl-corr:#d9dee8;--fl-open:#eef1f7;--fl-office:#f4efe7;--fl-meeting:#e3efec;--fl-break:#f7eadf;--fl-train:#ebe8f6;--fl-hall:#f0f0ec;--wall:#f7f8fb;--slab:#aab4c8;--win:#bfe0ff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--fl-corr:#1a2443;--fl-open:#26325c;--fl-office:#2f3358;--fl-meeting:#223b4b;--fl-break:#3a3046;--fl-train:#2f2f5e;--fl-hall:#2a3352;--wall:#35426d;--slab:#080f22;--win:#5b86c9} }
+:root[data-theme="dark"]{--fl-corr:#1a2443;--fl-open:#26325c;--fl-office:#2f3358;--fl-meeting:#223b4b;--fl-break:#3a3046;--fl-train:#2f2f5e;--fl-hall:#2a3352;--wall:#35426d;--slab:#080f22;--win:#5b86c9}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+svg{display:block;width:100%;height:auto}
+.iso polygon[fill],.iso circle[fill]{stroke:#0b122640;stroke-width:.35;stroke-linejoin:round}
+.fr{fill:var(--plan-fill);stroke:var(--plan);stroke-width:1.5;stroke-linejoin:round}
+.fr-sh{fill:var(--line)}
+.route{stroke:var(--plan);stroke-width:1;stroke-dasharray:3 4;fill:none;opacity:.7}
+.pin text{font-family:var(--body);font-weight:700;font-size:12px;fill:var(--ink)}
+.pin text.s{font-family:var(--mono);font-weight:400;font-size:9px;fill:var(--muted)}
+.pin .halo{fill:var(--accent);opacity:0}
+.pin:hover .halo,.pin:focus-visible .halo{opacity:.35}
+.pin.proj .tw{opacity:.55}
+.pin.full text.s{fill:var(--good)}
+
+.sites{display:flex;flex-direction:column;gap:10px;list-style:none;margin:0;padding:0}
+.site{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--ink)}
+.site:hover{border-color:var(--accent)}
+.site .n{font-family:var(--mono);font-size:.85rem;color:var(--accent);grid-row:span 2}
+.site b{font-family:var(--display);font-size:1.05rem}
+.site small{grid-column:2;color:var(--muted);font-size:.9rem}
+.site .c{font-family:var(--mono);font-size:.8rem;color:var(--muted);grid-row:span 2}
+.site.full .c{color:var(--good)}
+
+.head{display:grid;grid-template-columns:92px minmax(0,1fr);gap:16px;align-items:end}
+.head>div{display:flex;flex-direction:column;gap:6px}
+
+.floor{display:flex;flex-direction:column;gap:14px}
+#plan svg{min-width:640px}
+.slab.t{fill:var(--fl-corr)} .slab.r{fill:var(--slab)} .slab.l{fill:color-mix(in srgb,var(--slab) 78%,#000)}
+.wall.t{fill:var(--wall)} .wall.r{fill:color-mix(in srgb,var(--wall) 95%,#000)} .wall.l{fill:color-mix(in srgb,var(--wall) 89%,#000)}
+.win{fill:var(--win)}
+.fl{stroke:var(--line);stroke-width:1}
+.fl-open{fill:var(--fl-open)} .fl-office{fill:var(--fl-office)} .fl-meeting{fill:var(--fl-meeting)} .fl-break{fill:var(--fl-break)} .fl-train{fill:var(--fl-train)} .fl-hall{fill:var(--fl-hall)}
+.room{cursor:pointer}
+.room:hover,.room:focus-visible{stroke:var(--accent);stroke-width:2.5;outline:none}
+.room.on{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5}
+.obj{pointer-events:none}
+.tag{cursor:pointer}
+.tag rect{fill:var(--surface);stroke:var(--plan);stroke-width:1}
+.tag text{font-family:var(--mono);font-size:10px;fill:var(--ink)}
+.tag .tk{font-family:var(--body);font-size:12px;font-weight:700;fill:var(--good);visibility:hidden}
+.tag.on rect{fill:var(--accent);stroke:var(--accent)}
+.tag.on text{fill:var(--surface)}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.rooms li{display:flex}
+.rooms button{width:100%;text-align:left;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.rooms button:hover{border-color:var(--accent)}
+.rooms button.on{border-color:var(--accent);background:var(--accent-soft)}
+.rooms .n{font-family:var(--mono);color:var(--accent);grid-row:span 2}
+.rooms b{font-weight:600}
+.rooms small{grid-column:2;color:var(--muted);font-size:.85rem}
+.rooms .c{grid-row:span 2;color:var(--good);font-weight:700;align-self:center}
+
+.scene{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:18px;scroll-margin-top:70px}
+.scene:empty{display:none}
+.task{font-weight:600;max-width:65ch}
+.script{display:flex;flex-direction:column;gap:10px;max-width:68ch}
+.ln{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding-left:12px;border-left:2px solid var(--line)}
+.ln b{font-family:var(--mono);font-weight:500;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--plan)}
+.ln.me{border-left-color:var(--accent)} .ln.me b{color:var(--accent)}
+.ln.dir{border:0;padding:0;color:var(--muted);font-style:italic}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.btn{padding:9px 16px;border-radius:999px;border:1px solid var(--plan);background:var(--plan);color:var(--surface);font-weight:600}
+.btn.ghost{background:transparent;color:var(--plan)}
+.btn:disabled{opacity:.45;cursor:default}
+
+.act{display:flex;flex-direction:column;gap:12px}
+.item{padding:12px 14px;border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qa{display:flex;flex-direction:column;gap:10px}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.cat{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--bg);font-size:.9rem;text-align:left}
+.cat:hover:not(:disabled){border-color:var(--accent)}
+.cat:disabled{cursor:default;opacity:.6}
+.cat.right{background:var(--good-soft);border-color:var(--good);color:var(--good);opacity:1;font-weight:600}
+.cat.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);opacity:1;text-decoration:line-through}
+.why{font-size:.95rem;padding:8px 12px;border-radius:6px;max-width:68ch}
+.why.ok{background:var(--good-soft)} .why.ko{background:var(--bad-soft)}
+.score{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 3.2em;gap:10px;align-items:center}
+.bar i{display:block;height:8px;border-radius:4px;background:var(--plan)}
+.bar span{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.bar div{background:var(--plan-fill);border-radius:4px}
+
+.board{display:flex;flex-wrap:wrap;gap:4px 22px;align-items:baseline;padding:10px 14px;border-radius:8px;background:#141c33;color:#cfd8ee;font-family:var(--mono);font-size:.78rem}
+.board b{color:#7fe0b0;font-weight:500;font-size:1.05rem;margin-right:4px}
+.desks{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:8px}
+.desk{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 10px;align-items:center;text-align:left;padding:10px 10px 10px 12px;border:1px solid var(--line);border-left:4px solid var(--st);border-radius:8px;background:var(--surface)}
+.desk:hover{border-color:var(--accent);border-left-color:var(--st)}
+.desk .av{grid-row:span 2;width:32px;height:32px;border-radius:50%;background:var(--sk);position:relative;box-shadow:inset 0 11px 0 -2px var(--hr);margin:3px}
+.desk .av::after{content:"";position:absolute;inset:-4px;border:3px solid transparent;border-top-color:#232a3a;border-radius:50%}
+.desk .av::before{content:"";position:absolute;left:-5px;top:13px;width:7px;height:10px;border-radius:3px;background:#232a3a}
+.desk .nm{font-weight:600}
+.desk .st{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.st-call{--st:#e5484d} .st-wrap{--st:#f5a524} .st-free{--st:#30a46c} .st-pause{--st:#8a94a8}
+.desk.on{outline:2px solid var(--accent);outline-offset:1px}
+.desk.ok{background:var(--good-soft)} .desk.ko{background:var(--bad-soft)}
+.bubble{min-height:5em;padding:14px;border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;gap:10px}
+.hint{color:var(--muted)}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt::before{content:"";width:16px;height:16px;border:2px solid var(--muted);border-radius:4px;margin-top:3px}
+.opt[aria-pressed="true"]::before{background:var(--accent);border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.cost{font-family:var(--mono);font-size:.78rem;color:var(--muted);white-space:nowrap}
+.verdict{grid-column:2;font-size:.92rem;padding:6px 10px;border-radius:6px}
+.opt.good .verdict{background:var(--good-soft)} .opt.mid .verdict{background:var(--plan-fill)} .opt.bad .verdict{background:var(--bad-soft)}
+.summary{padding:12px 14px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;max-width:68ch}
+
+.ad{font-family:var(--mono);font-size:.92rem;line-height:1.9;padding:14px;border:1px dashed var(--plan);border-radius:6px;background:var(--bg)}
+.seg{cursor:pointer;border-bottom:1px dotted var(--muted)}
+.seg:hover{background:var(--accent-soft)}
+.seg.hit{background:var(--bad-soft);border-bottom:2px solid var(--bad);cursor:default}
+.seg.fine{background:var(--good-soft);border-bottom-color:transparent;cursor:default}
+.found{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;font-size:.95rem;max-width:68ch}
+
+details.keep{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+details.keep summary{cursor:pointer;padding:12px 14px;font-weight:700;font-family:var(--display)}
+details.keep .in{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;max-width:70ch}
+details.keep ul,details.keep ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;font-size:.92rem;min-width:460px;width:100%}
+th,td{text-align:left;vertical-align:top;padding:6px 10px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-weight:500;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.card{font-family:var(--mono);font-size:.88rem;line-height:1.7;padding:12px;border:1px dashed var(--plan);border-radius:6px}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-block:16px 32px}
+</style>
+
+<header class="top"><div class="wrap">
+  <a class="brand" href="#carte">Topi<i>Call</i></a>
+  <span class="crumb" id="crumb">Carte des implantations</span>
+  <span class="prog" id="prog"></span>
+</div></header>
+
+<main class="wrap">
+  <section class="view" id="v-carte">
+    <p class="mono">Cas TopiCall · mise en situation · TD 1, 3, 4, 5 et 6</p>
+    <h1>Vous venez d'être recruté·e aux ressources humaines de TopiCall.</h1>
+    <p class="lede">Quatre plateformes rachetées une à une, quatre directeurs attachés à leur autonomie, près de 200 salariés et aucune règle RH commune. Rendez-vous sur chaque site, entrez dans les salles, écoutez les équipes et prenez vos décisions. Le corrigé s'affiche après chaque scène.</p>
+    <ul class="facts">
+      <li><b>4</b> plateformes d'environ 50 personnes</li>
+      <li><b>1</b> chef d'équipe pour 10 téléconseillers</li>
+      <li>Appels sortants pour la <b>banque et l'assurance</b></li>
+      <li>Plage <b>8 h – 20 h</b>, lundi au samedi</li>
+      <li>Formation : <b>3 %</b> de la masse salariale</li>
+      <li>CDI privilégiés, jusqu'à <b>30 %</b> d'effectifs sans campagne en creux</li>
+    </ul>
+    <div class="intro">
+      <div>
+        <p class="mono">Avant d'entrer · TD 1</p>
+        <h2>Le secteur des centres d'appels</h2>
+        <ul>
+          <li><b>Un secteur en croissance.</b> 2,6 milliards d'euros de chiffre d'affaires en 2019 pour les centres d'appels, et +18,6 % entre 2019 et 2021 (Insee).</li>
+          <li><b>Deux modèles.</b> Environ 80 % des centres sont internes aux entreprises, 20 % sont des prestataires externes comme TopiCall (Xerfi).</li>
+          <li><b>Des prestataires très concurrencés.</b> La relation client externalisée employait 51 169 salariés en France en 2020. Moins de la moitié du chiffre d'affaires du marché français (48,5 % en 2021) est réalisée depuis la France : le reste vient de plateformes à l'étranger (EY pour le SP2C).</li>
+          <li><b>Des salariés diplômés.</b> 76 % des employés des centres de contact en France ont au moins le bac (EY pour le SP2C).</li>
+          <li><b>Un travail exposé.</b> Rythme intensif, contrôle des performances en temps réel, stress : l'INRS recommande de laisser de l'autonomie, y compris sur les scripts, et d'alterner les tâches.</li>
+          <li><b>Un démarchage de plus en plus encadré.</b> Liste d'opposition Bloctel, jours et horaires d'appel limités, puis interdiction du démarchage téléphonique sans consentement préalable depuis août 2026, sauf auprès de ses propres clients. Les prestataires relèvent de la convention collective des prestataires de services du secteur tertiaire.</li>
+        </ul>
+        <p class="src">Sources : <a href="https://www.insee.fr/fr/statistiques/6670636" target="_blank" rel="noopener">Insee</a> · <a href="https://www.ey.com/fr_fr/insights/customer/etude-sp2c" target="_blank" rel="noopener">étude EY pour le SP2C</a> · <a href="https://www.xerfi.com/presentationetude/le-marche-des-centres-de-contacts_sae68" target="_blank" rel="noopener">Xerfi</a> · <a href="https://www.inrs.fr/metiers/commerce-service/centre-appel.html" target="_blank" rel="noopener">INRS</a></p>
+      </div>
+      <div>
+        <p class="mono">À regarder</p>
+        <a class="vid" href="https://www.ina.fr/ina-eclaire-actu/centre-d-appel-call-center-teleconseiller-teleoperateur-condition-de-travail-technologie" target="_blank" rel="noopener"><b>Les centres d'appels dans les archives</b><small>INA · conditions de travail et technologie</small></a>
+        <a class="vid" href="https://www.youtube.com/watch?v=uTWUDYiB32M" target="_blank" rel="noopener"><b>Le métier en images</b><small>YouTube</small></a>
+        <p><b>Pendant le visionnage, repérez :</b></p>
+        <ul>
+          <li>ce qui rythme la journée d'un téléconseiller ;</li>
+          <li>ce qui est mesuré, écouté ou affiché ;</li>
+          <li>ce qui a changé avec la technologie, et ce qui n'a pas changé.</li>
+        </ul>
+        <p class="src">Les vidéos s'ouvrent dans un nouvel onglet.</p>
+      </div>
+    </div>
+    <div class="mapgrid">
+      <div class="sheet" id="map"></div>
+      <ol class="sites" id="sites"></ol>
+    </div>
+  </section>
+
+  <section class="view" id="v-site" hidden>
+    <div class="head"><div id="facade"></div><div>
+      <p class="mono" id="s-tag"></p><h2 id="s-name"></h2><p class="lede" id="s-intro"></p></div></div>
+    <div class="floor">
+      <div class="sheet" id="plan"></div>
+      <ol class="rooms" id="rooms"></ol>
+    </div>
+    <div class="scene" id="scene"></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Cas TopiCall : Nathalie Dumouchel, 2024, Prix du Cas AGRH 2024. Les prénoms et les répliques sont inventés pour la mise en scène, à partir des annexes du cas. Les éléments de corrigé sont une proposition à valider par l'équipe pédagogique.</div></footer>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const el=(t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e};
+const VF=[['v','Vrai'],['f','Faux']];
+const RISK=[['phy','Risque physique'],['int','Intensité et temps de travail'],['emo','Exigences émotionnelles'],['aut','Manque d\'autonomie'],['soc','Rapports sociaux'],['val','Conflit de valeurs'],['ins','Insécurité de la situation']];
+const bar=(t,p)=>`${t}<div class="bar"><div><i style="width:${p}%"></i></div><span>${p} %</span></div>`;
+
+const SITES=[
+{id:'marne',city:'Marne-la-Vallée',x:207,y:101,floors:5,hi:2,origin:'Plateforme d\'origine du dirigeant · rendez-vous pour des conseillers financiers',
+ ep:'Épisode 1 · TD 3',theme:'Les conditions de travail',
+ intro:'Le dirigeant veut racheter une plateforme à Bordeaux. Avant de vanter les conditions de travail de TopiCall, la DRH vous demande de les regarder de près.',
+ decor:[['office',[240,100,110,82],'Chef d\'équipe']],
+ rooms:[
+ {id:'m1',name:'Bureau du directeur',short:'Direction',kind:'office',box:[240,10,110,82],q:'Le cadrage de la mission',
+  script:[['Bruno, dirigeant','Je veux racheter une plateforme à Bordeaux. L\'intégration se passera mieux si l\'on peut montrer aux équipes ce que TopiCall offre en matière de conditions de travail.'],
+   ['Claire, DRH','Avant de valoriser, il faut regarder. Les représentants du personnel nous parlent de bruit, de mal de dos, d\'horaires qui ne conviennent pas à tout le monde, et surtout de stress.'],
+   ['Claire, DRH','Vous co-animez le groupe de travail avec moi.'],
+   ['Vous','Par quoi est-ce que je commence ?']],
+  act:{type:'classify',task:'Que répondez-vous à votre propre question ?',cats:[],items:[{t:'Votre première action',a:'b',
+   cats:[['a','Rédiger tout de suite la plaquette pour Bordeaux'],['b','Faire l\'état des lieux des risques sur le terrain'],['c','Commander une formation à la gestion du stress']],
+   why:'On ne valorise et on ne corrige que ce que l\'on a d\'abord observé. La plaquette viendra à la fin, et la formation au stress est une réponse choisie avant d\'avoir posé le diagnostic.'}]},
+  keep:`<p>La demande a deux faces : <b>protéger la santé</b> des téléconseillers et <b>valoriser</b> TopiCall comme employeur auprès de Bordeaux. La seconde n'est crédible que si la première est faite.</p>
+  <p>La démarche suit les questions du TD :</p><ol><li>diagnostic des facteurs de risques, physiques et psychosociaux ;</li><li>conséquences pour les salariés et pour l'entreprise ;</li><li>plan d'actions ;</li><li>points forts à communiquer.</li></ol>
+  <p>Cadre légal : l'employeur doit protéger la santé physique et mentale des salariés (Code du travail, art. L. 4121-1), évaluer les risques et les consigner dans le document unique d'évaluation des risques professionnels (DUERP). Les représentants du personnel sont associés.</p>`},
+ {id:'m2',name:'Plateau n°1',short:'Plateau n°1',kind:'open',box:[10,10,222,172],q:'Question 1 · le diagnostic des risques',
+  script:[['','Vous traversez le plateau entre deux vagues d\'appels. Dix téléconseillers acceptent de vous dire un mot.']],
+  act:{type:'plateau',task:'Passez de poste en poste. Pour chaque témoignage, indiquez le facteur de risque principal.',cats:RISK,items:[
+   {who:'Inès',t:'Avec le bruit du plateau, je monte le son du casque. Le soir, j\'ai les oreilles qui sifflent.',a:'phy',why:'Ambiance sonore : fatigue auditive, risque de choc acoustique au casque.'},
+   {who:'Julien',t:'Six heures assis, les yeux sur l\'écran, le casque sur la tête : j\'ai le dos en compote.',a:'phy',why:'Posture assise prolongée et travail sur écran : troubles musculosquelettiques, fatigue visuelle.'},
+   {who:'Fatou',t:'25 appels à l\'heure. Dès que je raccroche, le système m\'en remet un.',a:'int',why:'Cadence fixée par les objectifs et par le système d\'information, qui lance les appels.'},
+   {who:'Léa',t:'Une semaine du matin, une semaine de l\'après-midi : ma nourrice ne suit pas. Et personne n\'aime finir à 20 h.',a:'int',why:'Horaires décalés et alternés, samedi compris : difficile à concilier avec la vie familiale.'},
+   {who:'Mehdi',t:'Le script défile et je dois passer par chaque étape, même quand je sens que le client attend autre chose.',a:'aut',why:'Le plan d\'appel prescrit le discours : peu de marges de manœuvre.'},
+   {who:'Chloé',t:'On peut être écouté n\'importe quand, sans le savoir. Je surveille chaque mot.',a:['aut','soc'],why:'Contrôle permanent par les écoutes aléatoires. On peut aussi y voir un enjeu de rapports sociaux : confiance et relation avec l\'encadrement.'},
+   {who:'Antoine',t:'Trente refus dans la journée, dont deux insultes. Et il faut garder le sourire dans la voix.',a:'emo',why:'Agressivité des prospects et obligation d\'afficher une émotion que l\'on ne ressent pas.'},
+   {who:'Yasmine',t:'Un seul appel agressif et mon heure est fichue, même si elle avait bien commencé.',a:'emo',why:'Charge émotionnelle : les managers notent que les téléconseillers en perdent le sens des proportions.'},
+   {who:'Lucas',t:'J\'appelle des gens qui en ont assez d\'être démarchés. Parfois je me demande si je leur rends vraiment service.',a:'val',why:'Doute sur l\'utilité et la qualité de son travail : c\'est le conflit de valeurs.'},
+   {who:'Élodie',t:'Le mois dernier, trois semaines sans campagne. On est en CDI, mais si les clients ne reviennent pas ?',a:'ins',why:'Activité fluctuante, dépendance aux commandes des clients. Le CDI et la formation en période creuse limitent ce risque.'}]},
+  keep:`<p><b>Risques physiques</b> : bruit du plateau et écoute au casque, posture assise prolongée, travail sur écran, sollicitation de la voix.</p>
+  <p><b>Risques psychosociaux</b>, selon les six familles du rapport Gollac :</p>
+  <ul><li><b>Intensité et temps de travail</b> : 25 appels par heure, objectifs de durée et de taux de réponse, appels lancés par le système, horaires alternés de 8 h à 20 h du lundi au samedi.</li>
+  <li><b>Exigences émotionnelles</b> : rejets répétés, agressivité, « sourire au téléphone ».</li>
+  <li><b>Autonomie</b> : script à suivre étape par étape, écoutes aléatoires.</li>
+  <li><b>Rapports sociaux</b> : contrôle vécu comme une surveillance ; à l'inverse, l'équipe et le chef d'équipe sont des soutiens.</li>
+  <li><b>Conflits de valeurs</b> : démarcher des prospects lassés, parler au nom de la banque cliente.</li>
+  <li><b>Insécurité</b> : carnet de commandes incertain, jusqu'à 30 % des effectifs sans campagne.</li></ul>
+  <p>À remarquer : le script, les écoutes, les objectifs et le système d'appels servent la qualité vendue aux clients <em>et</em> créent du risque. C'est le même outil vu de deux côtés.</p>`},
+ {id:'m3',name:'Salle de pause',short:'Pause',kind:'break',box:[168,190,182,100],q:'Question 2 · les conséquences',
+  script:[['Nadia, élue du personnel','Ce que vous avez entendu sur le plateau, on le retrouve dans les arrêts maladie.'],
+   ['Nadia, élue du personnel','Et quand quelqu\'un de bien formé s\'en va, c\'est toute la formation payée par TopiCall qui part avec lui.'],
+   ['Vous','Donc deux colonnes : ce que cela fait aux personnes, ce que cela coûte à l\'entreprise.']],
+  act:{type:'classify',task:'Rangez chaque conséquence dans la bonne colonne.',cats:[['s','Santé des salariés'],['e','Entreprise']],items:[
+   {t:'Fatigue auditive, acouphènes',a:'s',why:'Atteinte liée au bruit et au casque.'},
+   {t:'Lombalgies, troubles musculosquelettiques',a:'s',why:'Atteinte liée à la posture et au travail sur écran.'},
+   {t:'Absentéisme qui désorganise les campagnes',a:'e',why:'Avec des campagnes d\'un mois et des délais courts, chaque absence pèse sur les objectifs contractuels.'},
+   {t:'Stress chronique, troubles du sommeil, épuisement',a:'s',why:'Atteinte à la santé mentale, liée aux facteurs psychosociaux.'},
+   {t:'Départs de téléconseillers formés',a:'e',why:'Le modèle de TopiCall repose sur des salariés stables et compétents : le turnover détruit l\'investissement en formation.'},
+   {t:'Qualité des appels en baisse, clients banque et assurance mécontents',a:'e',why:'Le téléconseiller porte l\'image de TopiCall et celle du client.'},
+   {t:'Mise en cause de la responsabilité de l\'employeur',a:'e',why:'L\'obligation de sécurité pèse sur l\'employeur.'}]},
+  keep:`<div class="tw"><table><tr><th>Pour les salariés</th><th>Pour l'entreprise</th></tr>
+  <tr><td>Fatigue auditive, troubles de la voix</td><td>Absentéisme, recours à l'intérim</td></tr>
+  <tr><td>Troubles musculosquelettiques, fatigue visuelle</td><td>Turnover, coûts de recrutement, formation perdue</td></tr>
+  <tr><td>Stress, anxiété, troubles du sommeil, épuisement</td><td>Baisse de qualité, clients moins fidèles</td></tr>
+  <tr><td>Vie personnelle perturbée par les horaires</td><td>Climat social dégradé, risque juridique, image d'employeur</td></tr></table></div>
+  <p>La « boucle vertueuse » de TopiCall (CDI, formation, compétence, clients fidèles) tient à la santé de ses téléconseillers. De mauvaises conditions de travail la cassent à la racine.</p>`},
+ {id:'m4',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[10,190,150,100],q:'Questions 3 et 5 · le plan d\'actions',
+  script:[['Claire, DRH','Le groupe de travail est réuni : deux téléconseillers, une cheffe d\'équipe, une élue, le responsable Qualité.'],
+   ['Claire, DRH','L\'entreprise tourne bien, mais tout ne passera pas. Vous avez 10 points de budget.'],
+   ['','Mettre à jour le document unique et associer les élus et le service de santé au travail n\'est pas une option : c\'est hors budget.']],
+  act:{type:'pick',budget:10,task:'Composez votre plan d\'actions sans dépasser 10 points.',opts:[
+   {t:'Compléter le « 25 appels par heure » par des objectifs de qualité, discutés avec les équipes',cost:2,p:1,lvl:'good',tag:'Prévention primaire.',why:'Agit sur la cause principale de l\'intensité.'},
+   {t:'Horaires : équipes du matin sur volontariat, fins à 20 h réparties, plannings connus à l\'avance',cost:2,p:1,lvl:'good',tag:'Prévention primaire.',why:'Répond directement à la demande des parents de jeunes enfants.'},
+   {t:'Traitement acoustique du plateau et casques à limiteur de niveau sonore',cost:3,p:1,lvl:'good',tag:'Prévention primaire.',why:'Supprime le risque à la source ; c\'est l\'action la plus chère.'},
+   {t:'Sièges et écrans réglables, formation aux postures',cost:2,p:1,lvl:'good',tag:'Prévention primaire.',why:'Adapte le poste à la personne.'},
+   {t:'Scripts plus souples, rédigés avec des téléconseillers',cost:1,p:1,lvl:'good',tag:'Prévention primaire.',why:'Redonne de l\'autonomie pour un coût faible.'},
+   {t:'Écoutes encadrées : règles connues, retour individuel à visée de formation, élus consultés',cost:1,p:1,lvl:'good',tag:'Prévention primaire.',why:'Transforme un contrôle subi en outil de progression, et sécurise le dispositif sur le plan juridique.'},
+   {t:'Droit de mettre fin à un appel injurieux, temps de récupération ensuite',cost:1,p:1,lvl:'good',tag:'Prévention primaire.',why:'Réduit l\'exposition à l\'agressivité.'},
+   {t:'Formation à la gestion des appels difficiles',cost:2,p:0,lvl:'mid',tag:'Prévention secondaire.',why:'Utile, mais elle aide à supporter le risque sans le réduire.'},
+   {t:'Temps d\'échange réguliers en équipe sur les appels difficiles',cost:1,p:0,lvl:'mid',tag:'Prévention secondaire.',why:'Renforce le soutien du collectif, déjà réel.'},
+   {t:'Cellule d\'écoute psychologique externe',cost:2,p:0,lvl:'mid',tag:'Prévention tertiaire.',why:'Prend en charge des personnes déjà en difficulté : nécessaire en complément, jamais seule.'},
+   {t:'Séances de sophrologie sur site',cost:2,p:0,lvl:'mid',tag:'Prévention secondaire.',why:'Agit sur l\'individu, pas sur l\'organisation du travail.'},
+   {t:'Baby-foot et corbeille de fruits en salle de pause',cost:1,p:0,lvl:'bad',tag:'Hors sujet.',why:'Ne répond à aucun des facteurs de risque relevés.'}],
+   summary:s=>{const T=s.reduce((a,o)=>a+o.cost,0),P=s.filter(o=>o.p).reduce((a,o)=>a+o.cost,0),r=P/T;
+    return `<b>${P} point${P>1?'s':''} sur ${T}</b> agissent sur les causes. `+(r>=.7?'Votre plan s\'attaque à l\'organisation du travail : c\'est la logique attendue.':r>=.4?'Plan équilibré, mais une bonne part du budget aide les salariés à supporter des risques que l\'on pourrait réduire.':'Votre plan soigne surtout les effets. Les causes relevées sur le plateau (cadence, horaires, bruit, script, écoutes) restent en place.')}},
+  keep:`<p>Un plan d'actions se construit par niveaux de prévention :</p>
+  <ul><li><b>Primaire</b>, en priorité : supprimer ou réduire le risque à la source (objectifs, horaires, bruit, postes, scripts, écoutes).</li>
+  <li><b>Secondaire</b> : aider les salariés à faire face (formation, échanges entre pairs).</li>
+  <li><b>Tertiaire</b> : prendre en charge ceux qui sont atteints (cellule d'écoute, accompagnement au retour).</li></ul>
+  <p>Chaque action a un responsable, une échéance et un indicateur de suivi (absentéisme, turnover, résultats d'enquête).</p>
+  <p><b>Enseignements de l'exercice</b></p>
+  <ul><li>On diagnostique le travail réel, sur le terrain et avec ceux qui le font.</li>
+  <li>La GRH arbitre entre des logiques contradictoires : qualité et coûts d'un côté, santé de l'autre.</li>
+  <li>Les conditions de travail sont une obligation légale, un facteur de performance et un argument d'attractivité.</li>
+  <li>La démarche est partagée : direction, RH, managers, élus, salariés.</li></ul>`}]},
+
+{id:'lille',city:'Lille',x:218,y:25,floors:4,hi:1,origin:'À l\'origine : vente de produits et services de téléphonie',
+ ep:'Épisode 2 · TD 4',theme:'Le recrutement',
+ intro:'Départs en retraite, congés maternité, mobilités : il faut recruter vite. À Lille, vous découvrez qu\'il n\'existe aucune fiche de poste commune.',
+ decor:[['office',[10,100,110,82],'Chef d\'équipe']],
+ rooms:[
+ {id:'l1',name:'Bureau du directeur',short:'Direction',kind:'office',box:[10,10,110,82],q:'Question 4 · l\'offre d\'emploi existante',
+  script:[['Philippe, directeur','Des fiches de poste ? Je n\'en ai jamais eu besoin. Je recrute au feeling.'],
+   ['Philippe, directeur','Tenez, voilà l\'annonce que je passe depuis des années. Elle marche très bien.'],
+   ['Vous','Je peux la lire avec un stylo rouge ?']],
+  act:{type:'spot',task:'Touchez les passages qui posent problème. Il y en a sept.',
+   segs:[['URGENT.',null],['Call center cherche',0],['téléopératrices.',1],['Jeunes femmes dynamiques',1],['de 20 à 30 ans,',2],['de langue maternelle française,',3],['sans contrainte familiale.',4],['Vous enchaînez les appels en suivant le script.',5],['Formation assurée.',null],['Salaire motivant, horaires à voir.',6],['Poste basé à Lille.',null]],
+   why:['L\'entreprise n\'est ni nommée ni présentée : rien sur TopiCall, ses clients, sa politique de CDI et de formation.',
+    'Offre réservée aux femmes : discrimination liée au sexe. L\'intitulé doit s\'adresser à tous.',
+    'Limite d\'âge : interdite dans une offre d\'emploi.',
+    'Critère lié à l\'origine. Ce que le poste exige, c\'est une excellente expression orale en français.',
+    'Discrimination liée à la situation de famille.',
+    'Mission réductrice : rien sur le conseil, la relation client, la montée en compétences.',
+    'Informations essentielles absentes : type de contrat, rémunération, horaires réels.']},
+  keep:`<p>Une offre d'emploi est un acte juridique et un acte de communication.</p>
+  <ul><li><b>Juridique</b> : aucun critère discriminatoire (sexe, âge, origine, situation de famille… Code du travail, art. L. 1132-1), pas de limite d'âge, pas d'allégation fausse, rédaction en français.</li>
+  <li><b>Communication</b> : elle porte l'image de qualité que TopiCall veut consolider. Elle présente l'entreprise, la mission, le profil, les conditions (contrat, horaires, lieu, rémunération) et la manière de candidater.</li></ul>`},
+ {id:'l2',name:'Plateau',short:'Plateau',kind:'open',box:[128,10,222,172],q:'Questions 1 et 2 · la fiche de poste',
+  script:[['','Vous vous asseyez à côté de Sarah, téléconseillère, en double écoute.'],
+   ['Sarah','Bonjour Madame, Sarah à l\'appareil, je vous appelle de la part de votre banque.'],
+   ['','Le plan d\'appel défile à l\'écran. La cliente répond qu\'elle n\'a pas le temps.'],
+   ['Sarah','Je comprends. Deux minutes suffisent pour voir si un rendez-vous avec votre conseiller vous serait utile.'],
+   ['','Rendez-vous pris. Sarah complète le dossier client, puis signale à son chef d\'équipe une objection que le script ne prévoit pas.']],
+  act:{type:'pick',max:5,task:'La trame de fiche de poste admet cinq activités au maximum. Lesquelles sont celles du téléconseiller ?',opts:[
+   {t:'Appeler les clients et prospects des campagnes confiées par les banques et assureurs',lvl:'good',tag:'Oui.',why:'C\'est le cœur du poste.'},
+   {t:'Négocier les délais des campagnes avec les acheteurs des clients',lvl:'bad',tag:'Non.',why:'Activité du commercial.'},
+   {t:'Présenter l\'offre et argumenter en s\'appuyant sur le plan d\'appel',lvl:'good',tag:'Oui.',why:'Le script guide, le téléconseiller convainc.'},
+   {t:'Suivre en temps réel l\'atteinte des objectifs de l\'équipe',lvl:'bad',tag:'Non.',why:'Activité du chef d\'équipe.'},
+   {t:'Écouter le besoin de l\'interlocuteur et répondre à ses objections',lvl:'good',tag:'Oui.',why:'C\'est ce que Sarah vient de faire.'},
+   {t:'Construire les plans d\'appel de chaque campagne',lvl:'bad',tag:'Non.',why:'Travail du responsable Qualité avec le commercial et le chargé de formation.'},
+   {t:'Prendre le rendez-vous ou conclure la vente, puis renseigner le dossier client',lvl:'good',tag:'Oui.',why:'Le résultat de l\'appel et sa traçabilité.'},
+   {t:'Dépanner l\'applicatif de relation client',lvl:'bad',tag:'Non.',why:'Activité du chargé de maintenance.'},
+   {t:'Se former aux produits de chaque nouvelle campagne et remonter les difficultés rencontrées',lvl:'good',tag:'Oui.',why:'L\'adaptabilité est une exigence explicite du poste.'}],
+   summary:s=>{const g=s.filter(o=>o.lvl==='good').length;return `<b>${g} activité${g>1?'s':''} sur 5</b> relève${g>1?'nt':''} bien du téléconseiller. Une fiche de poste décrit un poste précis dans une organisation précise : elle le distingue de ceux du chef d'équipe, du commercial ou du chargé de formation.`}},
+  keep:`<p><b>Fiches du Répertoire opérationnel des métiers et des emplois (ROME)</b> : pour le téléconseiller, <b>D1408 Téléconseil et télévente</b> ; pour le commercial, <b>D1402 Relation commerciale grands comptes et entreprises</b>. Le ROME a été refondu : vérifiez les codes sur le site de France Travail.</p>
+  <p class="card"><b>Intitulé</b> : Téléconseiller·ère banque et assurance<br><b>Rattachement</b> : chef·fe d'équipe<br><b>Mission</b> : réaliser, pour le compte des clients banque et assurance, des campagnes d'appels sortants à valeur ajoutée, en portant l'image de qualité de TopiCall et celle du client.<br><b>Activités</b> : appeler les clients et prospects · présenter l'offre et argumenter · écouter et traiter les objections · prendre rendez-vous ou conclure, et renseigner le dossier · se former à chaque campagne et remonter les difficultés.<br><b>Spécificités</b> : horaires variables entre 8 h et 20 h du lundi au samedi · travail au casque et sur écran · objectifs quantitatifs et qualitatifs · appels écoutés.</p>
+  <p class="card"><b>Intitulé</b> : Commercial·e clients banque et assurance<br><b>Rattachement</b> : directeur·rice de plateforme<br><b>Mission</b> : vendre les prestations de TopiCall aux acheteurs des banques et assureurs et maintenir sa place sur un marché très concurrentiel.<br><b>Activités</b> : prospecter et fidéliser · analyser le besoin · négocier prix et délais · négocier en interne le temps de montée en compétences · suivre les campagnes vendues.<br><b>Spécificités</b> : déplacements fréquents, permis de conduire.</p>`},
+ {id:'l3',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[200,190,150,100],q:'Questions 3 et 4 · le profil et l\'offre',
+  script:[['Philippe, directeur','Moi, je veux des jeunes. Ils sont plus souples sur les horaires.'],
+   ['Claire, DRH','On définit un profil à partir du poste, pas à partir d\'une idée que l\'on se fait du candidat.'],
+   ['Vous','Reprenons la fiche de poste et passons chaque critère au crible.']],
+  act:{type:'classify',task:'Ce critère peut-il figurer dans le profil de recrutement ?',cats:[['o','On le garde'],['n','On le retire']],items:[
+   {t:'Bac à Bac+2 (BTS relation client, titre professionnel de conseiller relation client à distance) ou expérience équivalente',a:'o',why:'Niveau cohérent avec le poste, et l\'expérience ouvre la porte aux parcours atypiques.'},
+   {t:'Moins de 30 ans',a:'n',why:'Discrimination liée à l\'âge, et sans rapport avec la capacité à tenir le poste.'},
+   {t:'Excellente expression orale en français',a:'o',why:'Compétence directement exigée par le poste.'},
+   {t:'De langue maternelle française',a:'n',why:'Critère lié à l\'origine. On évalue la maîtrise de la langue, pas la manière dont elle a été acquise.'},
+   {t:'Disponible sur la plage 8 h – 20 h du lundi au samedi, selon planning',a:'o',why:'Contrainte réelle du poste, qu\'il faut annoncer clairement.'},
+   {t:'Sans enfant en bas âge',a:'n',why:'Discrimination liée à la situation de famille. C\'est au candidat de juger si les horaires lui conviennent.'},
+   {t:'Première expérience de la relation client appréciée, débutants acceptés',a:'o',why:'Cohérent avec une entreprise qui forme beaucoup.'},
+   {t:'Photo exigée, bonne présentation',a:'n',why:'Apparence physique : critère discriminatoire, et sans objet pour un poste au téléphone.'}]},
+  keep:`<p><b>Profil de recrutement</b></p>
+  <ul><li><b>Diplôme</b> : Bac à Bac+2, commerce, relation client, banque ou assurance ; ou expérience équivalente.</li>
+  <li><b>Expérience</b> : une première expérience de la relation client est un plus ; débutants acceptés car TopiCall forme.</li>
+  <li><b>Qualités</b> : aisance orale, écoute, persévérance face au refus, adaptabilité, rigueur, goût du travail en équipe.</li></ul>
+  <p class="card"><b>Conseiller·ère clientèle à distance, banque et assurance (F/H) · CDI · Lille</b><br>TopiCall réunit quatre plateformes et près de 200 salariés. Nous réalisons pour de grandes banques et compagnies d'assurance des campagnes d'appels à valeur ajoutée. Notre choix : des contrats durables et trois fois plus de formation que l'obligation légale.<br><b>Votre mission</b> : vous contactez les clients de nos partenaires, écoutez leur situation et leur proposez le service ou le rendez-vous qui leur convient. Chaque campagne vous fait découvrir de nouveaux produits.<br><b>Votre profil</b> : vous aimez convaincre et écouter, vous vous exprimez avec aisance. Bac à Bac+2 ou expérience de la relation client ; débutants bienvenus.<br><b>Conditions</b> : CDI, formation à l'arrivée et à chaque campagne, équipe de dix avec un·e chef·fe d'équipe, horaires par roulement entre 8 h et 20 h du lundi au samedi, rémunération à préciser.<br><b>Pour candidater</b> : contact et date limite.</p>`},
+ {id:'l4',name:'Salle de formation',short:'Formation',kind:'train',box:[10,190,182,100],q:'Question 5 · détecter les potentiels',
+  script:[['','Session collective : six candidats, convoqués sans tri sur le diplôme.'],
+   ['Vous','Vous avez dix minutes pour lire cette fiche produit. Ensuite vous m\'appelez : je suis un artisan pressé.'],
+   ['Un candidat','Bonjour Monsieur, je vous appelle au sujet de votre assurance professionnelle.'],
+   ['Vous, dans le rôle du client','Ça ne m\'intéresse pas, j\'ai du travail.'],
+   ['','Vous notez sur votre grille : écoute, reformulation, réaction au refus, clarté.']],
+  act:{type:'pick',max:4,task:'Retenez quatre exercices pour vos sessions de recrutement.',opts:[
+   {t:'Simulation d\'appel sortant avec un client qui objecte',lvl:'good',tag:'Pertinent.',why:'Reproduit la situation de travail : argumentation et résistance au refus.'},
+   {t:'Analyse graphologique de la lettre de motivation',lvl:'bad',tag:'À écarter.',why:'Méthode sans validité démontrée et sans lien avec le poste.'},
+   {t:'Lecture d\'une fiche produit inconnue, puis présentation en deux minutes',lvl:'good',tag:'Pertinent.',why:'Mesure la capacité d\'apprentissage, clé puisque les produits changent à chaque campagne.'},
+   {t:'Questions sur les projets familiaux, pour vérifier la disponibilité',lvl:'bad',tag:'Interdit.',why:'Les informations demandées doivent avoir un lien direct avec l\'emploi.'},
+   {t:'Écoute d\'un message client, avec reformulation et saisie dans un formulaire',lvl:'good',tag:'Pertinent.',why:'Teste l\'écoute et la double tâche téléphone et écran.'},
+   {t:'Test de culture générale',lvl:'bad',tag:'À écarter.',why:'Ne dit rien de l\'aptitude à tenir le poste et pénalise des candidats qui feraient de bons téléconseillers.'},
+   {t:'Exercice en groupe : s\'accorder sur la réponse à un client mécontent',lvl:'good',tag:'Pertinent.',why:'Fait apparaître l\'esprit d\'équipe et la manière de gérer un désaccord.'}],
+   summary:s=>{const g=s.filter(o=>o.lvl==='good').length;return `<b>${g} exercice${g>1?'s':''} sur ${s.length}</b> ${g>1?'sont pertinents':'est pertinent'}. Le bon exercice fait faire au candidat un échantillon du travail réel, observé avec une grille identique pour tous.`}},
+  keep:`<p>Détecter un potentiel, c'est observer des aptitudes en situation plutôt que lire un CV : c'est le principe du recrutement par simulation.</p>
+  <ul><li>Simulation d'appel avec objections.</li><li>Appropriation rapide d'un produit inconnu.</li><li>Écoute, reformulation et saisie simultanée.</li><li>Exercice collectif.</li></ul>
+  <p>Trois règles : les méthodes sont <b>pertinentes</b> au regard du poste, le candidat en est <b>informé</b> à l'avance, et les informations demandées ont un <b>lien direct</b> avec l'emploi (Code du travail, art. L. 1221-6 et L. 1221-8).</p>`}]},
+
+{id:'lyon',city:'Lyon',x:266,y:234,floors:6,hi:3,origin:'À l\'origine : rendez-vous pour des agents immobiliers',
+ ep:'Épisode 3 · TD 5',theme:'La motivation',
+ intro:'Les fiches de poste sont communes, les conditions de travail progressent. Vous lancez une enquête dans les quatre sites pour comprendre ce qui motive les salariés.',
+ decor:[['office',[240,100,110,82],'Chef d\'équipe'],['break',[246,190,104,100],'Pause']],
+ rooms:[
+ {id:'y1',name:'Accueil',short:'Accueil',kind:'hall',box:[10,190,90,100],q:'Question 1 · que vaut l\'enquête ?',
+  script:[['','Dans le hall, l\'urne des élections du personnel. Hugo, stagiaire, finit de compter les bulletins.'],
+   ['Hugo, stagiaire','56 % de réponses. Tous les métiers, tous les âges et les quatre sites sont représentés.'],
+   ['Vous','Et les 44 % qui n\'ont rien glissé dans l\'urne ?'],
+   ['Hugo, stagiaire','On ne sait pas ce qu\'ils pensent.']],
+  act:{type:'classify',task:'Avant de lire les résultats, jugez la méthode.',cats:VF,items:[
+   {t:'Avec 56 % de réponses, les résultats décrivent l\'opinion de tous les salariés.',a:'f',why:'Le taux est correct et l\'échantillon varié, mais les non-répondants sont peut-être les plus démotivés, ou les plus méfiants.'},
+   {t:'Une échelle en quatre points oblige à prendre parti.',a:'v',why:'Sans position neutre, chacun penche d\'un côté. Additionner « plutôt » et « tout à fait d\'accord » efface ensuite les nuances.'},
+   {t:'« La qualité de vie au travail est supérieure à celle des autres call centers » mesure la satisfaction au travail.',a:'f',why:'C\'est une comparaison avec un secteur réputé difficile, que beaucoup ne connaissent que par ouï-dire. On peut être mieux qu\'ailleurs sans être bien.'},
+   {t:'Un résultat global peut cacher de forts écarts entre sites.',a:'v',why:'Un verbatim le dit : « Tous les sites ne sont pas traités à la même enseigne. » Il faut lire les résultats par site.'}]},
+  keep:`<p>Points solides : 30 minutes libérées sur le temps de travail, anonymat garanti par le papier et l'urne, zone d'expression libre, répondants représentatifs.</p>
+  <p>Limites : 44 % de silencieux, questions fermées et parfois orientées, résultats agrégés, déclaratif à un instant donné.</p>
+  <p>Une enquête crée une attente. Sans restitution ni suites, elle démotive.</p>`},
+ {id:'y2',name:'Bureau RH',short:'Bureau RH',kind:'office',box:[240,10,110,82],q:'Question 1 · lire les résultats',
+  script:[['Hugo, stagiaire','Voilà la part de « plutôt d\'accord » et « tout à fait d\'accord » pour chaque affirmation.'],
+   ['Vous','Séparons ce qui tient bon de ce qui doit nous alerter.']],
+  act:{type:'classify',task:'Classez chaque résultat.',cats:[['f','Point fort'],['m','Mitigé'],['a','Axe d\'amélioration']],items:[
+   {t:bar('La collaboration dans l\'équipe se passe bien',79),a:'f',why:'Le meilleur score : le collectif est le premier atout.'},
+   {t:bar('Les objectifs fixés permettent un travail de qualité',39),a:'a',why:'Six salariés sur dix pensent que leurs objectifs nuisent à la qualité.'},
+   {t:bar('Le manager direct apporte un soutien au quotidien',69),a:'f',why:'Le chef d\'équipe est reconnu comme un appui.'},
+   {t:bar('La reconnaissance de l\'entreprise est à la mesure des efforts fournis',32),a:'a',why:'Le score le plus bas de l\'enquête.'},
+   {t:bar('Le travail est intéressant et stimulant',55),a:'m',why:'Une courte majorité : ni un atout net, ni une alerte.'},
+   {t:bar('La qualité de vie au travail est supérieure à celle des autres call centers',67),a:'f',why:'Vos actions sur les conditions de travail sont perçues.'},
+   {t:bar('L\'autonomie et les marges de manœuvre sont suffisantes',38),a:'a',why:'Cohérent avec le poids du script et des écoutes.'},
+   {t:bar('Le management est juste et équitable au sein de TopiCall',44),a:['a','m'],why:'Moins d\'un sur deux. On apprécie son manager (69 %) mais on doute de l\'équité de l\'entreprise.'},
+   {t:bar('Les opportunités de développement et d\'évolution sont satisfaisantes',41),a:'a',why:'Peu de perspectives sans changer de région.'}]},
+  keep:`<p><b>Image générale</b> : on est plutôt bien chez TopiCall, sans y être vraiment mobilisé. L'environnement de travail satisfait, le travail lui-même et sa reconnaissance beaucoup moins.</p>
+  <ul><li><b>Points forts</b> : collaboration (79 %), soutien du manager (69 %), qualité de vie comparée (67 %).</li>
+  <li><b>Mitigé</b> : intérêt du travail (55 %).</li>
+  <li><b>Axes d'amélioration</b> : reconnaissance (32 %), autonomie (38 %), objectifs (39 %), évolution (41 %), équité (44 %).</li></ul>`},
+ {id:'y3',name:'Plateau',short:'Plateau',kind:'open',box:[10,10,222,172],q:'Question 2 · les théories de la motivation',
+  script:[['','Sept téléconseillers ont rempli la zone d\'expression libre. Vous allez les voir un par un.']],
+  act:{type:'plateau',task:'À quelle famille de facteurs se rattache chaque verbatim ?',cats:[['b','Besoins de l\'individu'],['t','Le travail lui-même'],['m','Système de management']],items:[
+   {who:'Poste 1',t:'Tous les sites ne sont pas traités à la même enseigne, certains ont des campagnes d\'appels plus intéressantes que d\'autres.',a:'m',why:'Sentiment d\'iniquité : on se compare aux autres (théorie de l\'équité d\'Adams).'},
+   {who:'Poste 2',t:'Beau métier si on aime la relation client ! Mais des fois, c\'est dur d\'avoir beaucoup de « Non ».',a:'t',why:'Le contenu du travail : son sens, et le retour, souvent négatif, que l\'on reçoit (Hackman et Oldham).'},
+   {who:'Poste 3',t:'Mon manager fait ce qu\'il peut pour nous encourager, mais il n\'a pas de marges de manœuvre. Qu\'on bosse bien ou pas, ça ne fait pas de différence sur la fiche de paye.',a:'m',why:'Aucun lien entre la performance et la récompense : c\'est l\'instrumentalité de Vroom qui fait défaut.'},
+   {who:'Poste 4',t:'Franchement, on est bien à TopiCall, et si certains ne s\'en rendent pas compte, c\'est qu\'ils ont trop l\'habitude de se plaindre.',a:'b',why:'Besoins de sécurité et de bonnes conditions satisfaits : des facteurs d\'hygiène, chez Herzberg.'},
+   {who:'Poste 5',t:'À quoi ça sert de nous coller des objectifs qu\'on ne pourra pas atteindre ? Au final, on a l\'impression d\'être nuls.',a:'m',why:'Un objectif motive s\'il est difficile mais atteignable (Locke). Ici l\'effort ne mène pas au résultat (Vroom), et l\'estime de soi en souffre.'},
+   {who:'Poste 6',t:'L\'équipe est top, c\'est pour les voir que je me lève le matin.',a:'b',why:'Besoin d\'appartenance (Maslow).'},
+   {who:'Poste 7',t:'Ce qui manque surtout, c\'est un peu d\'espoir de faire autre chose sans avoir à déménager à l\'autre bout de la France.',a:['b','m'],why:'Besoin d\'accomplissement et de progression. La réponse relève du management : la gestion des carrières.'}]},
+  keep:`<div class="tw"><table><tr><th>Famille</th><th>Théories</th><th>Chez TopiCall</th></tr>
+  <tr><td>Besoins de l'individu</td><td>Maslow, Herzberg</td><td>Appartenance et sécurité satisfaites ; estime et accomplissement en manque (reconnaissance 32 %, évolution 41 %)</td></tr>
+  <tr><td>Le travail lui-même</td><td>Hackman et Oldham</td><td>Travail intéressant pour 55 % ; autonomie faible (38 %) ; retours surtout négatifs des prospects</td></tr>
+  <tr><td>Système de management</td><td>Vroom, Adams, Locke</td><td>Objectifs jugés inatteignables (39 %), pas de lien effort-récompense, doute sur l'équité entre sites (44 %)</td></tr></table></div>
+  <p>Lecture avec Herzberg : TopiCall a soigné les <b>facteurs d'hygiène</b> (conditions, relations, encadrement), ce qui évite l'insatisfaction. Les <b>facteurs moteurs</b> (reconnaissance, responsabilité, évolution, intérêt du travail) restent faibles, et ce sont eux qui motivent.</p>
+  <p>Certains verbatims se rattachent à deux familles : l'important est de justifier le classement.</p>`},
+ {id:'y4',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[108,190,130,100],q:'Questions 3 et 4 · vos propositions',
+  script:[['Bruno, dirigeant','Vous m\'avez convaincu. Mais je ne peux pas tout faire cette année.'],
+   ['Claire, DRH','Trois actions. Celles qui répondent à ce que les salariés ont écrit.']],
+  act:{type:'pick',max:3,task:'Choisissez trois actions prioritaires.',opts:[
+   {t:'Restituer les résultats aux équipes de chaque site et annoncer les suites',lvl:'good',tag:'Indispensable.',why:'C\'est la condition pour que l\'enquête ne se retourne pas contre vous.'},
+   {t:'Verser une prime exceptionnelle identique à tous',lvl:'bad',tag:'Effet court.',why:'Elle ne récompense pas l\'effort (« qu\'on bosse bien ou pas… ») et son effet s\'éteint vite.'},
+   {t:'Revoir les objectifs avec les chefs d\'équipe et des téléconseillers : atteignables, avec une part de qualité',lvl:'good',tag:'Pertinent.',why:'Répond au score de 39 % et au verbatim sur les objectifs inatteignables.'},
+   {t:'Créer des parcours d\'évolution sur place : référent, tuteur, formateur, chef d\'équipe',lvl:'good',tag:'Pertinent.',why:'Répond au manque de perspectives sans mobilité géographique.'},
+   {t:'Organiser un séminaire de cohésion d\'équipe',lvl:'bad',tag:'Non prioritaire.',why:'La collaboration est déjà le point fort, à 79 %.'},
+   {t:'Reconnaître la contribution : part variable sur des critères connus, et reconnaissance non monétaire',lvl:'good',tag:'Pertinent.',why:'Répond au score le plus bas, la reconnaissance (32 %).'},
+   {t:'Répartir les campagnes entre les sites selon des règles connues de tous',lvl:'good',tag:'Pertinent.',why:'Répond au sentiment d\'iniquité entre sites.'},
+   {t:'Donner des marges de manœuvre aux chefs d\'équipe et de la souplesse sur les scripts',lvl:'good',tag:'Pertinent.',why:'Le soutien du manager existe, ses moyens d\'agir non. Répond aussi à l\'autonomie (38 %).'}],
+   summary:s=>{const g=s.filter(o=>o.lvl==='good').length,r=s.some(o=>o.tag==='Indispensable.');return `<b>${g} action${g>1?'s':''} sur ${s.length}</b> ${g>1?'répondent':'répond'} aux attentes exprimées. `+(r?'Vous avez pensé à la restitution : c\'est le point de départ de tout le reste.':'Il manque la restitution des résultats aux équipes : sans elle, les salariés concluront que leur parole n\'a servi à rien.')}},
+  keep:`<p>Les actions partent des résultats, et s'appuient sur les points forts (le collectif, les chefs d'équipe) pour traiter les points faibles.</p>
+  <ul><li>Restituer et associer les salariés au choix des actions.</li><li>Objectifs atteignables, mêlant quantité et qualité.</li><li>Reconnaissance, monétaire et non monétaire, liée à la contribution.</li><li>Parcours d'évolution et passerelles entre métiers.</li><li>Équité entre sites dans la répartition des campagnes.</li><li>Autonomie des téléconseillers et marges de manœuvre des managers.</li></ul>
+  <p><b>Enseignements de l'exercice</b></p>
+  <ul><li>Satisfaction et motivation sont deux choses distinctes.</li><li>Aucune théorie ne suffit seule : chacune éclaire une partie des résultats.</li><li>Une enquête engage : il faut restituer, agir, puis mesurer à nouveau.</li><li>La motivation dépend de la cohérence de toutes les pratiques RH : objectifs, rémunération, carrières, management.</li></ul>`}]},
+
+{id:'marseille',city:'Marseille',x:280,y:338,lx:1,floors:3,hi:1,origin:'À l\'origine : promotion de l\'investissement immobilier défiscalisé',
+ ep:'Épisode 4 · TD 6',theme:'L\'évaluation des salariés',
+ intro:'À Marseille, chaque chef d\'équipe évalue à sa façon. Vous devez poser des objectifs clairs, puis répondre à un directeur séduit par le classement des salariés.',
+ decor:[['office',[10,100,110,82],'Direction'],['break',[10,190,110,100],'Pause']],
+ rooms:[
+ {id:'s1',name:'Bureau de la cheffe d\'équipe',short:'Chef d\'équipe',kind:'office',box:[10,10,110,82],q:'Séquence 1 · objectif, indicateur, valeur cible',
+  script:[['Sophie, cheffe d\'équipe','Mes objectifs pour l\'équipe ? « Faire du chiffre » et « rester motivés ».'],
+   ['Vous','Un objectif dit où l\'on veut aller. Un indicateur dit comment on le mesure. Une valeur cible dit quel niveau on attend, et pour quand.'],
+   ['Sophie, cheffe d\'équipe','Alors mes deux objectifs ne sont rien de tout ça.']],
+  act:{type:'classify',task:'Objectif, indicateur ou valeur cible ?',cats:[['o','Objectif'],['i','Indicateur'],['c','Valeur cible']],items:[
+   {t:'Améliorer la qualité de la relation client',a:'o',why:'Une direction à suivre, formulée par un verbe d\'action.'},
+   {t:'Part des appels écoutés conformes à la grille qualité',a:'i',why:'Un instrument de mesure, sans niveau attendu.'},
+   {t:'90 % à la fin du trimestre',a:'c',why:'Un niveau et une échéance.'},
+   {t:'Nombre moyen d\'appels par heure',a:'i',why:'C\'est la mesure ; « 25 » en est la cible.'},
+   {t:'Fidéliser les téléconseillers',a:'o',why:'Un objectif qui s\'adresse plutôt à un chef d\'équipe ou à un directeur.'},
+   {t:'Taux de turnover annuel',a:'i',why:'L\'indicateur classique de la fidélisation.'},
+   {t:'Moins de 10 % sur l\'année',a:'c',why:'La valeur à atteindre sur l\'indicateur.'}]},
+  keep:`<div class="tw"><table><tr><th>Pour qui</th><th>Objectif</th><th>Indicateur</th><th>Valeur cible</th></tr>
+  <tr><td>Téléconseiller</td><td>Assurer la qualité des échanges</td><td>Part des appels écoutés conformes à la grille</td><td>90 % sur le trimestre</td></tr>
+  <tr><td>Téléconseiller</td><td>Obtenir des rendez-vous utiles au client</td><td>Part des rendez-vous pris qui sont honorés</td><td>80 % sur la campagne</td></tr>
+  <tr><td>Chef d'équipe</td><td>Préparer l'équipe à chaque campagne</td><td>Part des téléconseillers formés avant le lancement</td><td>100 %</td></tr></table></div>
+  <p>Les valeurs sont données à titre d'exemple. Un bon objectif est précis, mesurable, atteignable, lié au poste et daté ; le salarié dispose des moyens de l'atteindre et il a été discuté avec lui.</p>`},
+ {id:'s2',name:'Plateau',short:'Plateau',kind:'open',box:[128,10,222,172],q:'Séquence 1 · les effets des objectifs sur le travail',
+  script:[['','Trois mois plus tard, vous revenez voir comment les objectifs ont changé le travail.']],
+  act:{type:'plateau',task:'Effet recherché ou effet pervers ?',cats:[['r','Effet recherché'],['p','Effet pervers']],items:[
+   {who:'Karim',t:'Depuis que mon objectif est clair, je sais où j\'en suis à la fin de chaque journée.',a:'r',why:'Un objectif précis oriente l\'effort et donne un retour sur son travail.'},
+   {who:'Manon',t:'Pour tenir les 25 appels par heure, j\'abrège dès que le client hésite.',a:'p',why:'On fait ce qui est compté : la quantité chasse la qualité.'},
+   {who:'Théo',t:'Je coche « rendez-vous pris » même quand la personne a juste dit « rappelez-moi ».',a:'p',why:'L\'indicateur est manipulé : il s\'améliore, pas le résultat.'},
+   {who:'Aïcha',t:'On a un objectif d\'équipe sur la qualité : les anciens aident les nouveaux.',a:'r',why:'Un objectif collectif soutient la coopération.'},
+   {who:'Rémy',t:'Pour avoir une bonne écoute, je récite le script mot à mot.',a:'p',why:'La conformité devient le but, au détriment de la relation avec le client.'},
+   {who:'Lina',t:'Mon voisin a les meilleurs fichiers. Je ne lui passe plus mes astuces.',a:'p',why:'Des objectifs purement individuels mettent en concurrence et abîment le collectif.'}]},
+  keep:`<p><b>Effets recherchés</b> : clarté des attentes, effort orienté, retour sur son travail, base de discussion pour l'entretien, reconnaissance possible.</p>
+  <p><b>Effets pervers</b> : priorité à ce qui est mesuré, quantité contre qualité, indicateurs arrangés, stress, perte d'autonomie, concurrence entre collègues, démotivation si la cible est hors d'atteinte.</p>
+  <p><b>Précautions</b> : peu d'objectifs, équilibrés entre quantité et qualité, individuels et collectifs, discutés avec les intéressés et revus si le contexte change.</p>`},
+ {id:'s3',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[128,190,222,100],q:'Séquence 2 · l\'arrêt de la Cour de cassation',
+  script:[['Stéphane, directeur','J\'ai lu qu\'un grand groupe classe ses salariés chaque année : 20 % de très bons, 5 % d\'insuffisants. On fait pareil ?'],
+   ['Claire, DRH','Lisons d\'abord l\'arrêt Hewlett-Packard France : Cour de cassation, chambre sociale, 27 mars 2013.'],
+   ['Vous','Le comité d\'entreprise et les syndicats y attaquaient justement un classement par quotas.']],
+  act:{type:'classify',task:'Vrai ou faux, d\'après l\'arrêt ?',cats:VF,items:[
+   {t:'L\'employeur a le droit d\'évaluer le travail de ses salariés.',a:'v',why:'Ce droit découle de son pouvoir de direction, à condition d\'utiliser des critères objectifs et transparents.'},
+   {t:'Un classement par quotas que les évaluateurs sont tenus de respecter est licite, dès lors que les salariés en sont informés.',a:'f',why:'Il est illicite : il oblige à classer des salariés comme insuffisants même si tous ont atteint leurs objectifs. Le critère est donc étranger à leurs aptitudes.'},
+   {t:'La Cour de cassation a condamné Hewlett-Packard France.',a:'f',why:'Elle rejette le pourvoi. Les juges du fond ont constaté que les quotas n\'étaient pas appliqués : fourchettes indicatives, résultats très variables d\'un manager à l\'autre, seuil de 5 % jamais atteint.'},
+   {t:'Les salariés doivent être informés des méthodes d\'évaluation avant leur mise en œuvre.',a:'v',why:'Code du travail, art. L. 1222-3.'},
+   {t:'L\'évaluation peut porter sur des éléments sans lien avec les aptitudes professionnelles.',a:'f',why:'Les informations demandées doivent avoir un lien direct et nécessaire avec l\'évaluation des aptitudes (art. L. 1222-2).'},
+   {t:'Les représentants du personnel doivent être consultés avant la mise en place d\'un dispositif d\'évaluation.',a:'v',why:'C\'était le comité d\'entreprise et le CHSCT en 2013 ; c\'est aujourd\'hui le comité social et économique.'}]},
+  keep:`<p><b>1. Le dispositif</b> : le « ranking » par quotas, ou classement forcé. Les salariés sont répartis en groupes de notes (K, P, I) selon des pourcentages fixés à l'avance.</p>
+  <p><b>2. Les conditions de validité d'une évaluation</b></p>
+  <ul><li>des critères objectifs, transparents et pertinents au regard de la finalité ;</li><li>un lien direct et nécessaire avec les aptitudes professionnelles ;</li><li>une information préalable des salariés ;</li><li>une consultation préalable des représentants du personnel ;</li><li>des résultats confidentiels ;</li><li>un dispositif qui ne compromet pas la santé des salariés.</li></ul>
+  <p><b>3. Les problèmes soulevés</b> : des quotas, même indicatifs, introduisent un critère étranger aux aptitudes ; les salariés n'auraient pas été informés individuellement ; la mise en concurrence est source de stress ; les instances n'auraient pas été consultées.</p>
+  <p><b>La solution</b> : la Cour pose le principe (le classement par quotas imposés est illicite) mais rejette le pourvoi, car ce classement n'était pas appliqué en fait chez Hewlett-Packard France.</p>
+  <p><b>Pour TopiCall</b> : la proposition de Stéphane est à écarter. Les écoutes et les objectifs des téléconseillers doivent répondre aux mêmes exigences.</p>`}]},
+
+{id:'bordeaux',city:'Bordeaux',x:119,y:273,floors:4,hi:2,proj:1,origin:'Plateforme en cours de rachat',
+ ep:'Épilogue · TD 3, question 4',theme:'Convaincre la nouvelle plateforme',
+ intro:'Le rachat se précise. Les téléconseillers et l\'encadrement de Bordeaux vous attendent : que pouvez-vous leur dire, honnêtement, des conditions de travail chez TopiCall ?',
+ decor:[['open',[10,10,340,172],'Plateau à intégrer'],['hall',[178,190,172,100],'Accueil']],
+ rooms:[
+ {id:'b1',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[10,190,160,100],q:'Les points forts à valoriser',
+  script:[['Bruno, dirigeant','Ils sont une cinquantaine dans la salle d\'à côté, et ils ont entendu toutes sortes de choses sur nous.'],
+   ['Claire, DRH','On ne leur dira que ce que l\'on peut prouver.'],
+   ['Une téléconseillère de Bordeaux','Concrètement, chez vous, c\'est comment ?']],
+  act:{type:'classify',task:'Cet argument a-t-il sa place dans votre présentation ?',cats:[['o','À valoriser'],['n','Pas tel quel']],items:[
+   {t:'Les CDI sont privilégiés et le turnover est plus faible que chez les concurrents',a:'o',why:'Un fait vérifiable, qui répond à la première crainte lors d\'un rachat : l\'emploi.'},
+   {t:'Le budget de formation atteint 3 % de la masse salariale, et les périodes creuses servent à se former',a:'o',why:'C\'est le cœur du modèle TopiCall.'},
+   {t:'Chaque téléconseiller réalise 25 appels par heure',a:'n',why:'C\'est une contrainte du poste, à présenter franchement avec les objectifs de qualité qui la complètent.'},
+   {t:'Cinq minutes de pause par heure, jamais plus de six heures d\'affilée',a:'o',why:'Une règle concrète et protectrice.'},
+   {t:'Tous les appels peuvent être écoutés à tout moment',a:'n',why:'Présenté ainsi, c\'est de la surveillance. On valorise le dispositif une fois encadré : règles connues, retours à visée de formation.'},
+   {t:'Un chef d\'équipe pour dix téléconseillers',a:'o',why:'Un encadrement de proximité, que les salariés disent apprécier.'},
+   {t:'Les horaires alternés conviennent très bien aux jeunes mamans',a:'n',why:'Plusieurs intéressées disent le contraire, et l\'argument repose sur un stéréotype. On valorise plutôt les aménagements obtenus.'},
+   {t:'Un état des lieux des risques a été mené avec les élus, suivi d\'un plan d\'actions',a:'o',why:'La démarche elle-même est votre meilleur argument : elle montre comment TopiCall traite ses problèmes.'}]},
+  keep:`<p><b>À valoriser</b> : la stabilité de l'emploi, l'investissement en formation, les règles de pause et de durée, l'encadrement de proximité, la force des équipes, et la démarche d'amélioration engagée avec les représentants du personnel.</p>
+  <p><b>Règle de communication</b> : ne promettre que ce qui existe. Les équipes de Bordeaux compareront vite le discours et la réalité, et les contraintes du métier (cadence, horaires, écoutes) se disent mieux d'emblée.</p>
+  <p><b>Votre parcours</b> : en quatre épisodes, vous avez traité les conditions de travail, le recrutement, la motivation et l'évaluation. Ces pratiques se tiennent : des objectifs mal posés dégradent la santé, la motivation et la qualité du recrutement suivant. C'est ce qui fait de la GRH une fonction partagée entre la direction, les RH, les managers et les élus.</p>`}]}
+];
+const ALL=SITES.flatMap(s=>s.rooms.map(r=>r.id));
+
+/* ---- progression (confort de lecture uniquement) ---- */
+let DONE=new Set();
+try{DONE=new Set(JSON.parse(localStorage.getItem('topicall-done')||'[]'))}catch(e){}
+function mark(id){DONE.add(id);try{localStorage.setItem('topicall-done',JSON.stringify([...DONE]))}catch(e){} refresh()}
+const count=s=>s.rooms.filter(r=>DONE.has(r.id)).length;
+
+/* ---- moteur isométrique ---- */
+const shade=(h,f)=>'#'+[1,3,5].map(i=>Math.round(parseInt(h.slice(i,i+2),16)*f).toString(16).padStart(2,'0')).join('');
+function Iso(ox,oy,u){const a=.866*u,b=.5*u,r=v=>Math.round(v*10)/10;
+  const P=(x,y,z=0)=>[r(ox+(x-y)*a),r(oy+(x+y)*b-z*u)];
+  const poly=(pts,fill,o='')=>`<polygon points="${pts.join(' ')}" ${fill[0]==='#'?'fill':'class'}="${fill}"${o}/>`;
+  const faces=(x,y,z,w,d,h)=>[[P(x,y+d,z+h),P(x+w,y+d,z+h),P(x+w,y+d,z),P(x,y+d,z)],[P(x+w,y,z+h),P(x+w,y+d,z+h),P(x+w,y+d,z),P(x+w,y,z)],[P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)]];
+  const box=(x,y,z,w,d,h,c,o='')=>{const f=faces(x,y,z,w,d,h);return poly(f[0],shade(c,.72),o)+poly(f[1],shade(c,.86),o)+poly(f[2],c,o)};
+  const boxC=(x,y,z,w,d,h,c)=>{const f=faces(x,y,z,w,d,h);return poly(f[0],c+' l')+poly(f[1],c+' r')+poly(f[2],c+' t')};
+  const qy=(x,y,z,w,h,c,o='')=>poly([P(x,y,z+h),P(x+w,y,z+h),P(x+w,y,z),P(x,y,z)],c,o);
+  const qx=(x,y,z,d,h,c,o='')=>poly([P(x,y,z+h),P(x,y+d,z+h),P(x,y+d,z),P(x,y,z)],c,o);
+  return{P,poly,box,boxC,qy,qx,u}}
+
+const WOOD='#d8b78c',METAL='#8a94a8',DARK='#232a3a',SCREEN='#9bd8ff',CH=['#35539c','#e07a4d','#3c9a8b'],FELT=['#4f6fb0','#e07a4d','#3c9a8b'],
+  SKIN=['#f2c9a5','#d9a074','#a86f48','#70472f'],SHIRT=['#f4f4f6','#f2b84b','#6aa6e8','#e8727a','#7bc6a4','#b99be0'],HAIR=['#2b2118','#5a3a22','#c9a46b','#15151a'],BUSY=['#e5484d','#e5484d','#f5a524','#30a46c'];
+
+/* immeuble : emprise 3 x 3, n étages, étage hi mis en évidence */
+function tower(I,n,hi){let s=I.box(0,0,0,3,3,n,'#d3dbea')+I.box(.9,.9,n,1.2,1.2,.35,'#b9c3d8');
+  for(let f=0;f<n;f++)for(let i=0;i<3;i++){const c=f===hi?'#e8703a':'#5d7fc4';
+    s+=I.qy(i+.2,3,f+.25,.6,.5,c)+I.qx(3,i+.2,f+.25,.6,.5,shade(c,.82))}
+  return s}
+function facade(n,hi){const u=12,I=Iso(46,n*u+10,u);
+  return `<svg class="iso" viewBox="0 0 92 ${n*u+10+3*u+6}" aria-hidden="true">${tower(I,n,hi)}</svg>`}
+
+/* ---- carte ---- */
+const FR='200,6 248,52 292,73 356,95 340,155 300,215 324,228 338,318 297,348 281,342 254,335 219,348 219,376 181,374 135,366 86,338 103,282 105,241 103,215 76,170 8,138 11,118 54,101 81,110 95,110 92,65 101,67 135,82 138,73 165,54 178,22 185,11';
+function drawMap(){
+  const hq=SITES[0],u=4.2;let s=`<svg class="iso" viewBox="0 -16 380 408" role="group" aria-label="Carte des implantations de TopiCall"><polygon class="fr-sh" points="${FR}" transform="translate(3 5)"/><polygon class="fr" points="${FR}"/>`;
+  SITES.slice(1).forEach(t=>s+=`<line class="route" x1="${hq.x}" y1="${hq.y-6}" x2="${t.x}" y2="${t.y-6}"/>`);
+  [...SITES].sort((p,q)=>p.y-q.y).forEach(t=>{const i=SITES.indexOf(t),lx=t.lx?t.x-18:t.x+18,an=t.lx?' text-anchor="end"':'';
+    s+=`<a class="pin${t.proj?' proj':''}" data-pin="${t.id}" href="#${t.id}" aria-label="${t.city}, ${t.theme}"><ellipse class="halo" cx="${t.x}" cy="${t.y-1.5*u}" rx="19" ry="11"/><g class="tw">${tower(Iso(t.x,t.y-3*u,u),t.floors,-1)}</g><text x="${lx}" y="${t.y-12}"${an}>${t.city}</text><text class="s" x="${lx}" y="${t.y-1}"${an}>${t.proj?'projet':'épisode '+(i+1)}</text></a>`});
+  $('#map').innerHTML=s+'</svg>';
+  $('#sites').innerHTML=SITES.map((t,i)=>`<li><a class="site" data-site="${t.id}" href="#${t.id}"><span class="n">${t.proj?'+':i+1}</span><b>${t.city} · ${t.theme}</b><span class="c"></span><small>${t.origin}</small></a></li>`).join('');
+}
+
+/* ---- mobilier ---- */
+function person(I,x,y,z,n,back){const u=I.u,[hx,hy]=I.P(x,y,z+1.04),r=.33*u,f=v=>Math.round(v*10)/10;
+  let s=I.box(x-.31,y-.23,z,.62,.46,.68,SHIRT[n%6])+`<circle cx="${hx}" cy="${hy}" r="${f(r)}" fill="${SKIN[n%4]}"/>`;
+  s+=back?`<circle cx="${hx}" cy="${hy}" r="${f(r)}" fill="${HAIR[(n*3+1)%4]}"/>`:`<path d="M${f(hx-r)},${hy} a${f(r)},${f(r)} 0 0 1 ${f(2*r)},0 z" fill="${HAIR[(n*3+1)%4]}"/>`;
+  return s+`<path d="M${f(hx-r*1.08)},${f(hy+r*.2)} a${f(r*1.08)},${f(r*1.08)} 0 0 1 ${f(2.16*r)},0" fill="none" stroke="${DARK}" stroke-width="${f(.08*u)}"/><circle cx="${f(hx-r*1.08)}" cy="${f(hy+r*.3)}" r="${f(.1*u)}" fill="${DARK}"/>`}
+function stand(I,x,y,n,back){return I.box(x-.2,y-.15,0,.4,.3,.78,'#3a4460')+person(I,x,y,.78,n,back)}
+function seat(I,x,y,c,n,back,occ){const stem=I.box(x-.05,y-.05,0,.1,.1,.32,METAL),st=I.box(x-.35,y-.35,.32,.7,.7,.1,c),p=occ?person(I,x,y,.42,n,back):'';
+  return back?stem+st+p+I.box(x-.33,y+.3,.42,.66,.08,.6,c):stem+I.box(x-.33,y-.38,.42,.66,.08,.6,c)+st+p}
+function desk(I,x,y,rowB,n){const my=rowB?y+.22:y+.82,ky=rowB?y+.68:y+.2;let m='';
+  for(let i=0;i<2;i++){const mx=x+.28+i*.86;m+=I.box(mx+.31,my,.73,.14,.1,.14,METAL)+I.box(mx,my,.86,.76,.06,.48,DARK);
+    if(rowB)m+=I.qy(mx+.05,my+.065,.9,.66,.4,n%5===3?'#e6ecf6':SCREEN)}
+  m+=I.box(x+1.98,my,.73,.1,.1,.3,BUSY[n%4]);
+  const kb=I.box(x+.7,ky,.73,.8,.24,.03,'#eef1f6');
+  return I.box(x+.06,y+.1,0,.07,.9,.66,METAL)+I.box(x+2.07,y+.1,0,.07,.9,.66,METAL)+I.box(x,y,.66,2.2,1.1,.07,WOOD)+(rowB?m+kb:kb+m)}
+function bench(I,push,x,y,n,sd){for(let i=0;i<n;i++){const dx=x+i*2.2,k=sd+i;
+  push(dx+1.1+y+.45,seat(I,dx+1.1,y+.45,CH[k%3],k,false,(k*7)%9!==0));
+  push(dx+1.1+y+1.45,desk(I,dx,y+.9,false,k));
+  push(dx+1.1+y+2.05,I.box(dx,y+2,.55,2.2,.1,.8,FELT[Math.floor(sd/13)%3]));
+  push(dx+1.1+y+2.65,desk(I,dx,y+2.1,true,k+3));
+  push(dx+1.1+y+3.65,seat(I,dx+1.1,y+3.65,CH[(k+1)%3],k+5,true,(k*5+2)%8!==0))}}
+function wallscreen(I,x,y,w){let s=I.box(x,y,1.3,w,.08,1.2,DARK)+I.qy(x+.12,y+.09,1.42,w-.24,.96,'#16203a');
+  ['#30a46c','#f5a524','#6aa6e8','#30a46c'].forEach((c,i)=>s+=I.qy(x+.3+i*(w-.6)/4,y+.1,1.52,(w-.6)/4-.22,.3+((i*37)%5)/9,c));return s}
+function booth(I,x,y){return I.box(x,y,0,1.3,1.3,2.2,'#3c9a8b')+I.qy(x+.15,y+1.3,.1,1,1.9,'#d6ebf7',' opacity=".8"')}
+function plant(I,x,y){const u=I.u,[cx,cy]=I.P(x+.25,y+.25,1),f=v=>Math.round(v*10)/10;
+  return I.box(x,y,0,.5,.5,.45,'#f0ece4')+`<circle cx="${cx}" cy="${cy}" r="${f(.5*u)}" fill="#3f9b62"/><circle cx="${f(cx-.28*u)}" cy="${f(cy-.3*u)}" r="${f(.34*u)}" fill="#58b47a"/><circle cx="${f(cx+.3*u)}" cy="${f(cy-.12*u)}" r="${f(.3*u)}" fill="#2f8552"/>`}
+const FURN={
+ open(I,push,x,y,w,d,sd){const n=Math.min(8,Math.floor((w-3.6)/2.2)),rows=Math.max(1,Math.floor((d-.6)/4.2));
+  for(let r=0;r<rows;r++)bench(I,push,x+1,y+.7+r*4.2,n,sd+r*13);
+  push(x+y+.3,wallscreen(I,x+1+n*1.1-2,y+.12,4));
+  const bx=x+1+n*2.2+.7;
+  if(bx+1.3<=x+w){push(bx+.65+y+1.65,booth(I,bx,y+1));push(bx+.65+y+3.65,booth(I,bx,y+3));
+    push(bx+.6+y+6.6,I.box(bx,y+5.6,0,1.2,2,1.4,'#e9edf5')+I.qx(bx+1.2,y+5.7,.1,.85,1.2,'#cfd6e4')+I.qx(bx+1.2,y+6.65,.1,.85,1.2,'#cfd6e4'));
+    push(bx+.5+y+d-1.5,plant(I,bx+.3,y+d-1.8))}
+  push(x+.6+y+d-.9,plant(I,x+.3,y+d-1.2))},
+ office(I,push,x,y,w,d,sd){push(x+y+.3,I.box(x+.6,y+.25,0,2.4,.5,1.5,'#e9edf5')+I.box(x+.8,y+.3,1.5,.5,.4,.3,'#e07a4d')+I.box(x+1.6,y+.3,1.5,.9,.4,.2,'#4f6fb0'));
+  const dx=x+w/2-1.1,dy=y+d/2-.9;push(dx+1.1+dy+.55,desk(I,dx,dy,true,sd));push(dx+1.1+dy+1.6,seat(I,dx+1.1,dy+1.6,CH[sd%3],sd,true,true));
+  push(x+w-.9+y+.9,plant(I,x+w-1.2,y+.6))},
+ meeting(I,push,x,y,w,d,sd){const tw=Math.min(4.6,w-3),tx=x+w/2-tw/2,ty=y+d/2-.6,n=Math.max(2,Math.floor(tw/1.3));
+  push(x+y+.3,I.box(x+w/2-.1,y+.3,0,.2,.2,1.3,METAL)+wallscreen(I,x+w/2-1.4,y+.4,2.8));
+  for(let i=0;i<n;i++){const cx=tx+.65+i*(tw-1.3)/(n-1);
+    push(cx+ty-.55,seat(I,cx,ty-.55,CH[1],sd+i,false,(sd+i)%4!==0));push(cx+ty+1.95,seat(I,cx,ty+1.95,CH[1],sd+i+4,true,(sd+i)%3!==0))}
+  for(let j=0;j<tw;j++){const sw=Math.min(1,tw-j);push(tx+j+sw/2+ty+.7,I.box(tx+j,ty+.45,0,sw,.5,.66,'#c9ccd6')+I.box(tx+j,ty,.66,sw,1.4,.08,WOOD))}},
+ break(I,push,x,y,w,d,sd){for(let i=0;i<4;i++)push(x+1+i+y+.6,I.box(x+.5+i,y+.25,0,1,.7,.9,'#f0ece4')+I.box(x+.5+i,y+.25,.9,1,.7,.06,WOOD)+(i===1?I.box(x+.75+i,y+.4,.96,.5,.4,.6,DARK):''));
+  if(w>6.5)push(x+5.2+y+.6,I.box(x+4.7,y+.25,0,.9,.7,1.9,'#dfe3ea'));
+  const hx=x+w*.42,hy=y+d*.55;push(hx-1.1+hy,stand(I,hx-1.1,hy,sd,false));
+  push(hx+hy,I.box(hx-.1,hy-.1,0,.2,.2,1.05,METAL)+I.box(hx-.7,hy-.5,1.05,1.4,1,.07,WOOD));push(hx+.2+hy+.95,stand(I,hx+.2,hy+.95,sd+2,true));
+  if(w>8){const sx=x+w-4,sy=y+d-2;for(let i=0;i<3;i++)push(sx+i+.5+sy+.4,I.box(sx+i,sy-.3,0,1,.3,.95,'#e07a4d')+I.box(sx+i,sy,0,1,.9,.45,'#ea8c62'))}
+  push(x+.8+y+d-.9,plant(I,x+.5,y+d-1.2))},
+ train(I,push,x,y,w,d,sd){push(x+y+.3,wallscreen(I,x+w/2-1.8,y+.15,3.6));push(x+w/2+2.7+y+1.2,stand(I,x+w/2+2.7,y+1.2,sd,false));
+  const n=Math.floor((w-2)/1.6);for(let r=0;r<2;r++){const ty=y+2.6+r*2.1;if(ty+1.6>y+d)break;
+    for(let i=0;i<n;i++){const tx=x+1+i*1.6;push(tx+.8+ty+.35,I.box(tx+.1,ty+.1,0,.08,.5,.66,METAL)+I.box(tx,ty,.66,1.6,.7,.07,WOOD)+I.box(tx+.45,ty+.15,.73,.6,.05,.4,DARK));
+      push(tx+.8+ty+1.15,seat(I,tx+.8,ty+1.15,CH[2],sd+i+r*5,true,(i+r)%4!==3))}}},
+ hall(I,push,x,y,w,d,sd){const rx=x+w/2-1.2,ry=y+1.6;push(rx+1.2+ry-.5,seat(I,rx+1.2,ry-.5,CH[0],sd,false,true));
+  push(rx+1.2+ry+.4,I.box(rx,ry,0,2.4,.8,1.05,'#f4f5f8')+I.box(rx,ry,1.05,2.4,.8,.06,WOOD));
+  push(x+.8+y+d-1,plant(I,x+.5,y+d-1.3));
+  push(x+w-1.3+y+d-1.4,I.box(x+w-1.8,y+d-1.8,0,1,.8,1,'#4f6fb0')+I.box(x+w-1.6,y+d-1.5,1,.6,.2,.04,DARK))}
+};
+
+/* ---- plan d'étage ---- */
+function drawPlan(t){
+  const u=17,W=19,D=16,I=Iso(D*.866*u+8,3.2*u+18,u),it=[],push=(k,s)=>it.push([k,s]);
+  let s=`<svg class="iso" viewBox="0 0 ${Math.ceil((W+D)*.866*u+16)} ${Math.ceil((W+D)*.5*u+3.6*u+30)}" role="group" aria-label="Vue de l'étage, ${t.city}">`+I.boxC(0,0,-.5,W,D,.5,'slab')+I.boxC(0,-.3,0,W,.3,3,'wall')+I.boxC(-.3,-.3,0,.3,D+.3,3,'wall'),fl='',tags='';
+  for(let x=1.5;x<W-2;x+=3.2)s+=I.qy(x,0,1,2.2,1.5,'win');
+  for(let y=1.5;y<D-2;y+=3.2)s+=I.qx(0,y,1,2.2,1.5,'win');
+  [...(t.decor||[]).map(([kind,box])=>({kind,box})),...t.rooms].forEach((r,n)=>{const[x,y,w,d]=r.box.map(v=>v/19);
+    fl+=I.poly([I.P(x,y),I.P(x+w,y),I.P(x+w,y+d),I.P(x,y+d)],`fl fl-${r.kind}${r.id?' room':''}`,r.id?` data-room="${r.id}" tabindex="0" role="button" aria-label="${r.name}"`:'');
+    if(y>1)for(let i=0;i<w-.5;i++)if(i!==1)push(x+i+.5+y-.05,I.box(x+i,y-.1,0,Math.min(1,w-i),.1,2.1,'#a9cdef',' opacity=".4"'));
+    if(x>1)for(let i=0;i<d-.5;i++)if(i!==1)push(x-.05+y+i+.5,I.box(x-.1,y+i,0,.1,Math.min(1,d-i),2.1,'#a9cdef',' opacity=".4"'));
+    FURN[r.kind](I,push,x,y,w,d,n*11+t.floors);
+    if(r.id){const[tx,ty]=I.P(x+w/2,y+d/2,3),lab=`${t.rooms.indexOf(r)+1} · ${r.short}`,tw=lab.length*6.1+32;
+      tags+=`<g class="tag" data-room="${r.id}"><rect x="${tx-tw/2}" y="${ty-11}" width="${tw}" height="20" rx="10"/><text x="${tx-tw/2+10}" y="${ty+3}">${lab}</text><text class="tk" data-tick="${r.id}" x="${tx+tw/2-8}" y="${ty+3.5}" text-anchor="end">✓</text></g>`}});
+  it.sort((p,q)=>p[0]-q[0]);
+  $('#plan').innerHTML=s+fl+`<g class="obj">${it.map(p=>p[1]).join('')}</g>`+tags+'</svg>';
+  $('#rooms').innerHTML=t.rooms.map((r,i)=>`<li><button type="button" data-room="${r.id}"><span class="n">${i+1}</span><b>${r.name}</b><span class="c"></span><small>${r.q}</small></button></li>`).join('');
+  const go=n=>n&&openRoom(t,t.rooms.find(r=>r.id===n.dataset.room),true);
+  $('#plan').onclick=e=>go(e.target.closest('[data-room]'));
+  $('#plan').onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('[data-room]')){e.preventDefault();go(e.target.closest('[data-room]'))}};
+  $('#rooms').onclick=e=>go(e.target.closest('[data-room]'));
+  const pl=$('#plan');pl.scrollLeft=(pl.scrollWidth-pl.clientWidth)/2;
+}
+
+/* ---- composants d'activité ---- */
+function qa(it,cats,cb){const cs=it.cats||cats,acc=[].concat(it.a),box=el('div','qa'),row=el('div','btns');
+  cs.forEach(([k,l])=>{const b=el('button','cat',l);b.type='button';b.onclick=()=>{const good=acc.includes(k);
+    [...row.children].forEach((x,j)=>{x.disabled=true;if(acc.includes(cs[j][0]))x.classList.add('right')});
+    if(!good)b.classList.add('wrong');
+    box.append(el('p','why '+(good?'ok':'ko'),`<b>${good?'Oui.':'À revoir.'}</b> ${it.why}`));cb(good)};row.append(b)});
+  box.append(row);return box}
+function scoreLine(){const p=el('p','score');let n=0,ok=0;return{p,add(g,tot){n++;ok+=g?1:0;p.textContent=`${ok} bonne${ok>1?'s':''} réponse${ok>1?'s':''} sur ${n} · ${tot-n} à traiter`;return n===tot}}}
+function classify(root,c,done){const sc=scoreLine();
+  c.items.forEach(it=>{const card=el('div','item');card.append(el('div',null,it.t),qa(it,c.cats,g=>{if(sc.add(g,c.items.length))done()}));root.append(card)});
+  root.append(sc.p)}
+const STAT=[['call','En appel'],['wrap','Post-appel'],['call','En appel'],['free','Disponible'],['call','En appel'],['pause','En pause']];
+function plateau(root,c,done){const N=c.items.length,live=c.items.filter((_,i)=>STAT[i%6][0]==='call').length,
+  board=el('div','board',`<span><b>25</b>appels par heure visés</span><span><b>80 %</b>des appels sous 2 min</span><span><b>${live}/${N}</b>en ligne</span>`),
+  grid=el('div','desks'),bub=el('div','bubble','<p class="hint">Choisissez un poste pour écouter.</p>'),sc=scoreLine(),nodes=new Map();
+  c.items.forEach((it,i)=>{const[k,l]=STAT[i%6],b=el('button','desk st-'+k,`<span class="av" style="--sk:${SKIN[i%4]};--hr:${HAIR[(i*3+1)%4]}"></span><span class="nm">${it.who}</span><span class="st">${l}</span>`);b.type='button';
+    b.onclick=()=>{$$('.desk',grid).forEach(x=>x.classList.remove('on'));b.classList.add('on');
+      if(!nodes.has(it)){const n=el('div','qa');n.append(el('p',null,`<b>${it.who}</b> : « ${it.t} »`),qa(it,c.cats,g=>{b.classList.add(g?'ok':'ko');if(sc.add(g,N))done()}));nodes.set(it,n)}
+      bub.replaceChildren(nodes.get(it))};
+    grid.append(b)});
+  root.append(board,grid,bub,sc.p)}
+function pick(root,c,done){const head=el('p','score'),list=el('div','opts'),go=el('button','btn','Valider mes choix'),sel=new Set(),cap=c.budget||c.max;
+  const used=()=>[...sel].reduce((a,i)=>a+(c.budget?c.opts[i].cost:1),0);
+  const upd=()=>{head.textContent=c.budget?`${used()} point${used()>1?'s':''} engagé${used()>1?'s':''} sur ${cap}`:`${sel.size} choix sur ${cap}`;go.disabled=!sel.size};
+  c.opts.forEach((o,i)=>{const b=el('button','opt',`<span>${o.t}${c.budget?` <span class="cost">· ${o.cost} pt${o.cost>1?'s':''}</span>`:''}</span>`);b.type='button';b.setAttribute('aria-pressed','false');
+    b.onclick=()=>{if(sel.has(i))sel.delete(i);else{if(used()+(c.budget?o.cost:1)>cap){head.textContent=c.budget?'Budget dépassé : retirez une action avant d\'en ajouter une.':`Vous avez déjà ${cap} choix : retirez-en un pour en changer.`;return}sel.add(i)}
+      b.setAttribute('aria-pressed',sel.has(i));upd()};list.append(b)});
+  go.type='button';go.onclick=()=>{$$('.opt',list).forEach((b,i)=>{const o=c.opts[i];b.disabled=true;b.classList.add(o.lvl);b.append(el('span','verdict',`<b>${o.tag}</b> ${o.why}`))});
+    go.remove();root.append(el('p','summary',c.summary([...sel].map(i=>c.opts[i]))));done()};
+  root.append(head,list,go);upd()}
+function spot(root,c,done){const ad=el('p','ad'),cnt=el('p','score'),out=el('ol','found'),seen=new Set(),tot=c.why.length;
+  const upd=()=>cnt.textContent=`${seen.size} défaut${seen.size>1?'s':''} repéré${seen.size>1?'s':''} sur ${tot}`;
+  const hit=(sp,i)=>{if(sp.dataset.off)return;sp.dataset.off=1;
+    if(i==null){sp.classList.add('fine');return}
+    sp.classList.add('hit');if(!seen.has(i)){seen.add(i);out.append(el('li',null,`<b>« ${sp.textContent} »</b> ${c.why[i]}`));upd();if(seen.size===tot){all.remove();done()}}};
+  c.segs.forEach(([t,i])=>{const sp=el('span','seg',t);sp.tabIndex=0;sp.setAttribute('role','button');sp.onclick=()=>hit(sp,i);
+    sp.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hit(sp,i)}};sp._i=i;ad.append(sp,' ')});
+  const all=el('button','btn ghost','Montrer les défauts restants');all.type='button';all.onclick=()=>$$('.seg',ad).forEach(sp=>sp._i!=null&&hit(sp,sp._i));
+  root.append(ad,cnt,out,all);upd()}
+const ACTS={classify,plateau,pick,spot};
+
+/* ---- scène ---- */
+let CUR=null;
+function openRoom(t,r,scroll){
+  CUR=r.id;const sc=$('#scene');sc.replaceChildren();
+  $$('[data-room]').forEach(n=>n.classList.toggle('on',n.dataset.room===r.id));
+  sc.append(el('p','mono',`${t.city} · ${r.q}`),el('h3',null,r.name));
+  const box=el('div','script'),ctl=el('div','row'),next=el('button','btn','Suite'),skip=el('button','btn ghost','Tout afficher');next.type=skip.type='button';
+  const act=el('div','act'),keep=el('details','keep',`<summary>Le corrigé de cette scène</summary><div class="in">${r.keep}</div>`),nav=el('div','row');
+  let i=0;
+  const line=()=>{const[w,x]=r.script[i++];box.append(w?el('p','ln'+(w.startsWith('Vous')?' me':''),`<b>${w}</b><span>${x}</span>`):el('p','ln dir',x));if(i>=r.script.length)play()};
+  const play=()=>{ctl.remove();act.hidden=false};
+  next.onclick=line;skip.onclick=()=>{while(i<r.script.length)line()};
+  ctl.append(next,skip);
+  const finish=()=>{mark(r.id);keep.open=true;
+    const k=t.rooms.indexOf(r),nx=t.rooms[k+1];
+    if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
+    else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
+  act.hidden=true;act.append(el('p','task',r.act.task));ACTS[r.act.type](act,r.act,finish);
+  sc.append(box,ctl,act,keep,nav);line();
+  if(scroll)sc.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+}
+
+/* ---- navigation ---- */
+function refresh(){
+  $('#prog').textContent=`${ALL.filter(i=>DONE.has(i)).length} / ${ALL.length} salles`;
+  SITES.forEach(t=>{const n=count(t),full=n===t.rooms.length;
+    const a=$(`[data-site="${t.id}"]`);if(a){a.classList.toggle('full',full);$('.c',a).textContent=`${n}/${t.rooms.length}`}
+    const p=$(`[data-pin="${t.id}"]`);if(p)p.classList.toggle('full',full)});
+  $$('#plan [data-tick]').forEach(e=>e.style.visibility=DONE.has(e.dataset.tick)?'visible':'hidden');
+  $$('#rooms button').forEach(b=>$('.c',b).textContent=DONE.has(b.dataset.room)?'✓':'');
+}
+function route(){
+  const t=SITES.find(s=>s.id===location.hash.slice(1));
+  $('#v-carte').hidden=!!t;$('#v-site').hidden=!t;
+  $('#crumb').textContent=t?`Carte › ${t.city}`:'Carte des implantations';
+  if(t){$('#facade').innerHTML=facade(t.floors,t.hi);$('#s-tag').textContent=t.ep;$('#s-name').textContent=`${t.city} · ${t.theme}`;$('#s-intro').textContent=t.intro;
+    drawPlan(t);$('#scene').replaceChildren();CUR=null;
+    openRoom(t,t.rooms.find(r=>!DONE.has(r.id))||t.rooms[0],false)}
+  refresh();window.scrollTo(0,0);
+}
+drawMap();route();addEventListener('hashchange',route);
+</script>
+</body></html>
