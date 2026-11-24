@@ -19,7 +19,8 @@ Page publiée : https://claude.ai/artifact/3pLmenV3LiMAb5EpsyR6si (privée tant 
 4. **Moteur isométrique** (`Iso`, `tower`, `FURN`, `drawPlan`) : immeubles de la carte et vues d'étage. Les `box` des salles sont en pixels d'un plan 360 x 300, divisés par 19 pour obtenir les unités du monde.
 5. **Activités** : `classify` (classement ou vrai/faux), `plateau` (postes façon console de supervision), `pick` (choix sous budget ou en nombre limité), `spot` (passages fautifs à repérer).
 6. **Poste de travail** (`CALL`, `poste`) : dans les quatre salles de plateau (`kind:'open'`), un bouton ouvre un écran où défile un modèle de plan d'appel sortant. Le défilement est automatique, sauf si le navigateur demande de réduire les animations.
-7. **Navigation** : une vue par ancre (`#carte`, `#marne`, `#lille`, `#lyon`, `#marseille`, `#bordeaux`). La progression est gardée dans `localStorage`, par navigateur.
+7. **Matériel ergonomique** (`ERGO`, `ergo`, `chair`) : dans la salle de réunion de Marne-la-Vallée (`ergo:1`), un bouton ouvre sept fiches dessinées en SVG (fauteuil, bureau assis-debout, souris verticale, bras d'écran, casque, repose-pieds, cloisons). Ce sont des dessins, pas des photos.
+8. **Navigation** : une vue par ancre (`#carte`, `#marne`, `#lille`, `#lyon`, `#marseille`, `#bordeaux`). La progression est gardée dans `localStorage`, par navigateur.
 
 ## Correspondance avec le livret
 
