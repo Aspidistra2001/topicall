@@ -179,6 +179,24 @@ svg{display:block;width:100%;height:auto}
 .seg.fine{background:var(--good-soft);border-bottom-color:transparent;cursor:default}
 .found{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;font-size:.95rem;max-width:68ch}
 
+.poste{display:flex;flex-direction:column;gap:12px}
+.pc{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;align-items:center;text-align:left;padding:6px 14px 6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);align-self:flex-start;max-width:100%}
+.pc:hover,.pc[aria-expanded="true"]{border-color:var(--accent)}
+.pc svg{width:64px}
+.pc span{display:flex;flex-direction:column}
+.pc small{color:var(--muted);font-size:.85rem}
+.mon{display:flex;flex-direction:column;gap:10px;max-width:560px}
+.mon-in{position:relative;margin-bottom:22px;padding:10px;border-radius:12px;background:#232a3a}
+.mon-in::after{content:"";position:absolute;left:50%;bottom:-22px;width:120px;height:22px;transform:translateX(-50%);background:#232a3a;clip-path:polygon(35% 0,65% 0,70% 70%,100% 70%,100% 100%,0 100%,0 70%,30% 70%)}
+.mon-bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;padding:6px 10px;border-radius:6px 6px 0 0;background:#0b1226;color:#7fe0b0;font-family:var(--mono);font-size:.72rem}
+.mon-scr{position:relative;height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding:14px 14px 170px;border-radius:0 0 6px 6px;background:#141c33;color:#cfd8ee}
+.stp{flex:none;display:flex;flex-direction:column;gap:4px;opacity:.55;transition:opacity .2s}
+.stp.cur{opacity:1}
+.stp b{font-family:var(--mono);font-weight:500;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:#7fe0b0}
+.stp .nt{font-family:var(--mono);font-size:.78rem;color:#f5c26b}
+.stp i{font-style:normal;color:#9bd8ff}
+.mon .src{font-size:.82rem;color:var(--muted)}
+
 details.keep{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
 details.keep summary{cursor:pointer;padding:12px 14px;font-weight:700;font-family:var(--display)}
 details.keep .in{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;max-width:70ch}
@@ -735,6 +753,42 @@ function spot(root,c,done){const ad=el('p','ad'),cnt=el('p','score'),out=el('ol'
   root.append(ad,cnt,out,all);upd()}
 const ACTS={classify,plateau,pick,spot};
 
+/* ---- poste de travail : le plan d'appel défile à l'écran ---- */
+/* Une ligne qui commence par « > » est une consigne affichée au téléconseiller, les autres sont à dire. */
+const CALL={camp:'Campagne « Rendez-vous épargne » · appels sortants',steps:[
+ ['Présentation',['« Bonjour, <i>[Prénom]</i> à l\'appareil. Je vous appelle de la part de <i>[Banque]</i>, votre banque. »','> Sourire dans la voix, débit posé.']],
+ ['Interlocuteur et disponibilité',['« Je suis bien avec <i>[Civilité Nom]</i> ? Avez-vous deux minutes à m\'accorder ? »','> Si non : proposer un rappel et noter le créneau.']],
+ ['Motif de l\'appel',['« Votre conseiller, <i>[Conseiller]</i>, souhaite faire le point avec vous sur votre épargne. Je vous appelle pour convenir d\'un rendez-vous. »']],
+ ['Découverte',['« À quand remonte votre dernier rendez-vous en agence ? »','« Avez-vous un projet dans les mois qui viennent : logement, études des enfants, retraite ? »','> Laisser répondre, reformuler en une phrase.']],
+ ['Proposition',['« Le rendez-vous dure trente minutes, en agence ou par téléphone, et ne vous engage à rien. »']],
+ ['Objections',['> « Je n\'ai pas le temps »','« Je comprends. C\'est pour cela que je vous propose un créneau qui vous arrange, y compris par téléphone. »','> « Ça ne m\'intéresse pas »','« C\'est noté. Un point rapide permet simplement de vérifier que vos placements vous conviennent toujours. »','> « Envoyez-moi un courrier »','« Bien sûr. Votre conseiller vous présentera le document lors du rendez-vous : préférez-vous le matin ou la fin de journée ? »','> Deuxième refus : ne pas insister, remercier et prendre congé.']],
+ ['Prise de rendez-vous',['« Préférez-vous mardi à 10 h ou jeudi à 17 h 30 ? »','> Toujours deux créneaux au choix. Vérifier l\'agenda de <i>[Conseiller]</i>.']],
+ ['Récapitulatif',['« Je récapitule : rendez-vous <i>[Jour]</i> à <i>[Heure]</i> avec <i>[Conseiller]</i>, à l\'agence <i>[Agence]</i>. Vous recevrez une confirmation par SMS. »']],
+ ['Prise de congé',['« Merci de votre accueil, <i>[Civilité Nom]</i>. Je vous souhaite une très bonne journée. »']],
+ ['Post-appel',['> Saisir l\'issue dans le dossier client : rendez-vous, rappel, refus, ne plus appeler.','> Noter toute objection que le script ne prévoit pas.','> Appel suivant dans 15 secondes.']]]};
+function poste(){
+  const w=el('div','poste'),b=el('button','pc',`<svg class="iso" viewBox="0 0 64 64" aria-hidden="true">${desk(Iso(22,28,20),0,0,true,1)}</svg><span><b>Poste de travail</b><small>Afficher le plan d'appel qui défile à l'écran</small></span>`),
+    m=el('div','mon',`<div class="mon-in"><div class="mon-bar"><span>${CALL.camp}</span><span class="mon-st"></span></div><div class="mon-scr" tabindex="0" role="region" aria-label="Plan d'appel">${CALL.steps.map(([k,ls],i)=>`<div class="stp"><b>${i+1} · ${k}</b>${ls.map(l=>l[0]==='>'?`<span class="nt">→${l.slice(1)}</span>`:`<span>${l}</span>`).join('')}</div>`).join('')}</div></div>`),
+    scr=$('.mon-scr',m),st=$('.mon-st',m),stp=$$('.stp',m),pp=el('button','btn','Pause'),rw=el('button','btn ghost','Revenir au début'),row=el('div','row');
+  let run=false,pos=0,last=0;
+  const end=()=>scr.scrollHeight-scr.clientHeight-1;
+  const cur=()=>{let k=0;stp.forEach((s,i)=>{if(s.offsetTop<=scr.scrollTop+40)k=i});stp.forEach((s,i)=>s.classList.toggle('cur',i===k));st.textContent=`Étape ${k+1}/${stp.length}`};
+  const tick=ts=>{if(!run)return;if(!scr.isConnected||m.hidden){run=false;return}
+    if(Math.abs(scr.scrollTop-pos)>2)pos=scr.scrollTop;
+    pos+=Math.max(0,Math.min(ts-last,100))*.026;last=ts;scr.scrollTop=pos;
+    if(pos>=end()){run=false;pp.textContent='Relancer';return}
+    requestAnimationFrame(tick)};
+  const start=()=>{if(scr.scrollTop>=end())scr.scrollTop=0;run=true;pos=scr.scrollTop;last=performance.now();pp.textContent='Pause';requestAnimationFrame(tick)};
+  const stop=()=>{run=false;pp.textContent='Faire défiler'};
+  b.type=pp.type=rw.type='button';b.setAttribute('aria-expanded','false');m.hidden=true;
+  pp.onclick=()=>run?stop():start();
+  rw.onclick=()=>{scr.scrollTop=pos=0;cur()};
+  scr.onscroll=cur;
+  b.onclick=()=>{m.hidden=!m.hidden;b.setAttribute('aria-expanded',!m.hidden);
+    if(m.hidden)stop();else{cur();matchMedia('(prefers-reduced-motion: reduce)').matches?stop():start()}};
+  row.append(pp,rw);m.append(row,el('p','src','Modèle de script inventé pour la mise en scène. Les mentions entre crochets sont remplies par le système à partir du fichier client.'));
+  w.append(b,m);return w}
+
 /* ---- scène ---- */
 let CUR=null;
 function openRoom(t,r,scroll){
@@ -753,7 +807,7 @@ function openRoom(t,r,scroll){
     if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
     else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
   act.hidden=true;act.append(el('p','task',r.act.task));ACTS[r.act.type](act,r.act,finish);
-  sc.append(box,ctl,act,keep,nav);line();
+  sc.append(box,ctl,...(r.kind==='open'?[poste()]:[]),act,keep,nav);line();
   if(scroll)sc.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 

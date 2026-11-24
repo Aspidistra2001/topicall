@@ -18,7 +18,8 @@ Page publiée : https://claude.ai/artifact/3pLmenV3LiMAb5EpsyR6si (privée tant 
 3. **Données** (`SITES`) : cinq sites, chacun avec ses salles. Une salle porte un `script` (répliques `[qui, texte]`, `''` pour une didascalie), une activité `act` et le corrigé `keep` en HTML.
 4. **Moteur isométrique** (`Iso`, `tower`, `FURN`, `drawPlan`) : immeubles de la carte et vues d'étage. Les `box` des salles sont en pixels d'un plan 360 x 300, divisés par 19 pour obtenir les unités du monde.
 5. **Activités** : `classify` (classement ou vrai/faux), `plateau` (postes façon console de supervision), `pick` (choix sous budget ou en nombre limité), `spot` (passages fautifs à repérer).
-6. **Navigation** : une vue par ancre (`#carte`, `#marne`, `#lille`, `#lyon`, `#marseille`, `#bordeaux`). La progression est gardée dans `localStorage`, par navigateur.
+6. **Poste de travail** (`CALL`, `poste`) : dans les quatre salles de plateau (`kind:'open'`), un bouton ouvre un écran où défile un modèle de plan d'appel sortant. Le défilement est automatique, sauf si le navigateur demande de réduire les animations.
+7. **Navigation** : une vue par ancre (`#carte`, `#marne`, `#lille`, `#lyon`, `#marseille`, `#bordeaux`). La progression est gardée dans `localStorage`, par navigateur.
 
 ## Correspondance avec le livret
 
@@ -53,5 +54,5 @@ Le script demande Playwright et Chromium. Il écrit `apercu.html` et des capture
 - **Vidéos** : les deux pages n'ont pas pu être consultées. Les intitulés des liens et les consignes de visionnage sont génériques.
 - **Chiffres du secteur** : tirés de résumés de recherche (Insee, EY pour le SP2C, Xerfi, INRS), données 2019 à 2021, à contrôler sur les documents.
 - **Droit** : encadrement du démarchage téléphonique, convention collective et codes ROME (D1408, D1402) cités de mémoire.
-- **Prénoms et répliques** inventés, sauf les verbatims de l'enquête du TD 5.
+- **Prénoms et répliques** inventés, sauf les verbatims de l'enquête du TD 5. Le plan d'appel du poste de travail est inventé lui aussi.
 - **Diffusion** : le livret interdit la diffusion des supports sans autorisation et précise que les corrigés de TD ne sont pas diffusés.
