@@ -551,13 +551,7 @@ const SITES=[
   <tr><td>Le travail lui-même</td><td>Hackman et Oldham ; Ryan et al.</td><td>Travail intéressant pour 55 % ; autonomie faible (38 %) ; objectifs qui permettent mal un travail de qualité (39 %) ; retours surtout négatifs des prospects</td></tr>
   <tr><td>Système de management</td><td>Vroom, Adams, Locke</td><td>Qualité de vie au travail jugée meilleure qu'ailleurs (67 %) et soutien du manager (69 %) ; mais objectifs dits inatteignables dans les verbatims, pas de lien effort-récompense, doute sur l'équité (44 %)</td></tr></table></div>
   <p>Lecture avec Herzberg : TopiCall a soigné les <b>facteurs d'hygiène</b> (conditions, relations, encadrement), ce qui évite l'insatisfaction. Les <b>facteurs moteurs</b> (reconnaissance, responsabilité, évolution, intérêt du travail) restent faibles, et ce sont eux qui motivent.</p>
-  <p><b>La motivation intrinsèque</b></p>
-  <p>On appelle motivation intrinsèque la <b>satisfaction que l'individu retire de la tâche</b> et qui le conduit à s'engager dans l'activité en l'absence de toute incitation ou menace extérieure (Ryan et al., 1996). Elle se distingue de ce qui pousse de l'extérieur : la prime, l'objectif chiffré, le contrôle.</p>
-  <p>Cette satisfaction peut avoir deux origines (Ryan et Deci, 2000) :</p>
-  <div class="tw"><table><tr><th>Origine</th><th>Ce que cela veut dire</th><th>Dans l'enquête TopiCall</th></tr>
-  <tr><td><b>La tâche elle-même</b></td><td>Elle est objectivement intéressante</td><td>« Le travail est intéressant et stimulant » : 55 % seulement. L'autonomie est faible (38 %), les refus s'enchaînent, et « certains ont des campagnes d'appels plus intéressantes que d'autres ».</td></tr>
-  <tr><td><b>La psychologie de l'individu</b></td><td>Il est disposé à trouver la tâche intéressante</td><td>« Beau métier <em>si on aime la relation client</em> » : la même tâche satisfait les uns et pas les autres. « On est bien à TopiCall, et si certains ne s'en rendent pas compte… » dit la même chose.</td></tr></table></div>
-  <p>Deux leviers en découlent. Sur la <b>tâche</b> : l'enrichir, avec plus de marges de manœuvre sur le script, des campagnes variées et mieux réparties entre les sites, des missions de tutorat ou de formation. Sur les <b>personnes</b> : recruter des candidats qui aiment réellement la relation client, ce que cherchent à détecter les exercices du TD 4. Une prime ou un objectif n'agit sur aucun des deux : ils incitent de l'extérieur, sans rendre le travail plus satisfaisant.</p>
+  <p>La <b>motivation intrinsèque</b> se travaille directement sur le plateau : ouvrez le bouton « Motivation intrinsèque », au-dessus des postes.</p>
   <p>Certains verbatims se rattachent à deux familles : l'important est de justifier le classement.</p>`},
  {id:'y4',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[108,190,130,100],q:'Questions 3 et 4 · vos propositions',
   script:[['Bruno, dirigeant','Vous m\'avez convaincu. Mais je ne peux pas tout faire cette année.'],
@@ -926,6 +920,29 @@ let CUR=null;
 /* ---- vidéos de terrain : liens YouTube, ouverts dans un nouvel onglet (pas de lecteur intégré possible) ---- */
 const TERRAIN=['OM4gNKtgFyI','CONWUJHChQA','7hwYo-oZF2o','I0qpNCg4rMo'];
 function terrain(){return el('div','ergo',`<div class="fourn"><p><b>Voir et entendre un vrai plateau.</b> Lancez une vidéo et écoutez d'abord sans regarder : le niveau de bruit, le débit des voix, les phrases qui reviennent. Puis observez les postes, les écrans et ce que fait l'encadrement.</p><p class="lk">${TERRAIN.map((id,i)=>`<a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Vidéo ${i+1}</a>`).join('')}</p><p class="src">Vidéos hébergées sur YouTube, ouvertes dans un nouvel onglet.</p></div>`)}
+/* ---- motivation intrinsèque : activité de découverte sur le plateau de Lyon, puis rappel du cours ---- */
+const INTR=`<p><b>La motivation intrinsèque</b></p>
+  <p>On appelle motivation intrinsèque la <b>satisfaction que l'individu retire de la tâche</b> et qui le conduit à s'engager dans l'activité en l'absence de toute incitation ou menace extérieure (Ryan et al., 1996). Elle se distingue de ce qui pousse de l'extérieur : la prime, l'objectif chiffré, le contrôle.</p>
+  <p>Cette satisfaction peut avoir deux origines (Ryan et Deci, 2000) :</p>
+  <div class="tw"><table><tr><th>Origine</th><th>Ce que cela veut dire</th><th>Dans l'enquête TopiCall</th></tr>
+  <tr><td><b>La tâche elle-même</b></td><td>Elle est objectivement intéressante</td><td>« Le travail est intéressant et stimulant » : 55 % seulement. L'autonomie est faible (38 %), les refus s'enchaînent, et « certains ont des campagnes d'appels plus intéressantes que d'autres ».</td></tr>
+  <tr><td><b>La psychologie de l'individu</b></td><td>Il est disposé à trouver la tâche intéressante</td><td>« Beau métier <em>si on aime la relation client</em> » : la même tâche satisfait les uns et pas les autres. « On est bien à TopiCall, et si certains ne s'en rendent pas compte… » dit la même chose.</td></tr></table></div>
+  <p>Deux leviers en découlent. Sur la <b>tâche</b> : l'enrichir, avec plus de marges de manœuvre sur le script, des campagnes variées et mieux réparties entre les sites, des missions de tutorat ou de formation. Sur les <b>personnes</b> : recruter des candidats qui aiment réellement la relation client, ce que cherchent à détecter les exercices du TD 4. Une prime ou un objectif n'agit sur aucun des deux : ils incitent de l'extérieur, sans rendre le travail plus satisfaisant.</p>`;
+function intrinseque(){
+  const w=el('div','poste'),b=el('button','pc',`<svg class="iso" viewBox="0 0 64 64" aria-hidden="true">${seat(Iso(32,44,24),0,0,CH[1],2,false,true)}</svg><span><b>Motivation intrinsèque</b><small>Même campagne, même script : d'où vient l'envie de s'y mettre ? Six réponses à classer</small></span>`),
+    m=el('div','ergo'),act=el('div','act'),keep=el('details','keep',`<summary>Ce que dit le cours</summary><div class="in">${INTR}</div>`);
+  act.append(el('p','task','Vous demandez à six téléconseillers ce qui les fait décrocher le téléphone chaque matin. D\'où vient leur engagement ?'));
+  classify(act,{cats:[['t','La tâche elle-même'],['p','La psychologie de l\'individu'],['x','Incitation ou menace extérieure']],items:[
+    {t:'« La campagne sur l\'assurance des artisans, j\'adore : chaque appel est un cas différent, il faut comprendre le métier du client. »',a:'t',why:'C\'est le contenu du travail qui intéresse : la tâche est objectivement variée et demande de réfléchir.'},
+    {t:'« Je tiens les 25 appels par heure pour la prime de fin de mois. »',a:'x',why:'L\'engagement vient d\'une récompense extérieure à la tâche : ce n\'est pas de la motivation intrinsèque.'},
+    {t:'« Beau métier si on aime la relation client ! »',a:'p',why:'Tout est dans le « si » : la satisfaction dépend de la disposition de la personne à trouver la tâche intéressante.'},
+    {t:'« Je suis le script à la lettre parce qu\'on peut m\'écouter à tout moment. »',a:'x',why:'Ici c\'est une menace extérieure, le contrôle, qui fait agir.'},
+    {t:'« Réciter le même texte quarante fois par jour, n\'importe qui s\'en lasserait. »',a:'t',why:'La cause est encore la tâche elle-même, mais dans l\'autre sens : telle qu\'elle est conçue, elle offre peu de satisfaction.'},
+    {t:'« Moi, j\'ai toujours aimé parler aux gens. Même pour vendre un contrat, ça me plaît. »',a:'p',why:'La même tâche que le collègue d\'à côté, vécue autrement : c\'est la personne qui fait la différence.'}]},()=>{keep.open=true});
+  m.append(act,keep,el('p','src','Cinq réponses sont inventées pour l\'exercice ; « Beau métier si on aime la relation client » vient de l\'enquête.'));
+  b.type='button';b.setAttribute('aria-expanded','false');m.hidden=true;
+  b.onclick=()=>{m.hidden=!m.hidden;b.setAttribute('aria-expanded',!m.hidden)};
+  w.append(b,m);return w}
 function openRoom(t,r,scroll){
   CUR=r.id;const sc=$('#scene');sc.replaceChildren();
   $$('[data-room]').forEach(n=>n.classList.toggle('on',n.dataset.room===r.id));
@@ -942,7 +959,7 @@ function openRoom(t,r,scroll){
     if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
     else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
   act.hidden=true;act.append(el('p','task',r.act.task));ACTS[r.act.type](act,r.act,finish);
-  sc.append(box,ctl,...(r.kind==='open'?[poste(),...(t.id==='marne'?[terrain()]:[])]:r.ergo?[ergo()]:[]),act,keep,nav);line();
+  sc.append(box,ctl,...(r.kind==='open'?[poste(),...(t.id==='marne'?[terrain()]:[]),...(t.id==='lyon'?[intrinseque()]:[])]:r.ergo?[ergo()]:[]),act,keep,nav);line();
   if(scroll)sc.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 
