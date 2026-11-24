@@ -926,7 +926,7 @@ function openRoom(t,r,scroll){
     if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
     else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
   act.hidden=true;act.append(el('p','task',r.act.task));ACTS[r.act.type](act,r.act,finish);
-  sc.append(box,ctl,...(r.kind==='open'?[poste(),...(t.id==='lille'?[]:[terrain()])]:r.ergo?[ergo()]:[]),act,keep,nav);line();
+  sc.append(box,ctl,...(r.kind==='open'?[poste(),...(t.id==='marne'?[terrain()]:[])]:r.ergo?[ergo()]:[]),act,keep,nav);line();
   if(scroll)sc.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 
