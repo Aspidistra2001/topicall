@@ -182,7 +182,9 @@ svg{display:block;width:100%;height:auto}
 
 .poste{display:flex;flex-direction:column;gap:12px}
 .pc{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;align-items:center;text-align:left;padding:6px 14px 6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);align-self:flex-start;max-width:100%}
-.pc:hover,.pc[aria-expanded="true"]{border-color:var(--accent)}
+.pc:hover,.pc[aria-expanded="true"],.pc[aria-pressed="true"]{border-color:var(--accent)}
+.pc[aria-pressed="true"]{background:var(--accent-soft)}
+.poste>.src{font-size:.82rem;color:var(--muted);max-width:68ch}
 .pc svg{width:64px}
 .pc span{display:flex;flex-direction:column}
 .pc small{color:var(--muted);font-size:.85rem}
@@ -868,8 +870,55 @@ function ergo(){
 
 /* ---- scène ---- */
 let CUR=null;
+/* ---- ambiance sonore du plateau : synthèse Web Audio, aucun fichier ni enregistrement ---- */
+const AMB={ctx:null,out:null,timers:[],on:false,btn:null,
+ start(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
+  const c=this.ctx=new AC(),out=this.out=c.createGain(),rnd=(a,b)=>a+Math.random()*(b-a),T=(f,ms)=>this.timers.push(setTimeout(f,ms));
+  this.on=true;out.gain.value=0;const lim=c.createDynamicsCompressor();out.connect(lim).connect(c.destination);out.gain.setTargetAtTime(6,c.currentTime,.6);
+  const nb=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const noise=()=>{const s=c.createBufferSource();s.buffer=nb;s.loop=true;return s};
+  /* souffle de la ventilation */
+  const v=noise(),vf=c.createBiquadFilter(),vg=c.createGain();vf.type='lowpass';vf.frequency.value=320;vg.gain.value=.05;v.connect(vf).connect(vg).connect(out);v.start();
+  /* réverbération courte d'un grand plateau */
+  const ir=c.createBuffer(2,Math.floor(c.sampleRate*.9),c.sampleRate);for(let ch=0;ch<2;ch++){const x=ir.getChannelData(ch);for(let i=0;i<x.length;i++)x[i]=(Math.random()*2-1)*Math.pow(1-i/x.length,3)}
+  const rev=c.createConvolver(),rg=c.createGain(),bus=c.createGain();rev.buffer=ir;rg.gain.value=.5;rev.connect(rg).connect(out);bus.connect(out);bus.connect(rev);
+  /* voix indistinctes : une source par téléconseiller, filtrée par deux formants qui changent à chaque syllabe */
+  for(let k=0;k<7;k++){const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter(),f1=c.createBiquadFilter(),f2=c.createBiquadFilter(),mix=c.createGain(),base=rnd(95,230),vol=rnd(.05,.12);
+   o.type='sawtooth';o.frequency.value=base;g.gain.value=0;lp.type='lowpass';lp.frequency.value=rnd(1400,2400);f1.type=f2.type='bandpass';f1.Q.value=6;f2.Q.value=8;
+   o.connect(f1).connect(mix);o.connect(f2).connect(mix);let tail=mix.connect(lp).connect(g);
+   if(c.createStereoPanner){const p=c.createStereoPanner();p.pan.value=rnd(-.9,.9);tail=tail.connect(p)}
+   tail.connect(bus);o.start();
+   const syll=()=>{if(!this.on)return;const t=c.currentTime,len=rnd(.11,.24);
+     f1.frequency.setTargetAtTime(rnd(300,800),t,.03);f2.frequency.setTargetAtTime(rnd(900,2300),t,.03);o.frequency.setTargetAtTime(base*rnd(.88,1.18),t,.05);
+     g.gain.setTargetAtTime(vol*rnd(.5,1),t,.02);g.gain.setTargetAtTime(vol*.15,t+len*.7,.03);T(Math.random()<.13?pause:syll,len*1000)},
+    pause=()=>{if(!this.on)return;g.gain.setTargetAtTime(0,c.currentTime,.05);T(syll,rnd(500,3500))};
+   T(syll,rnd(0,2500))}
+  /* frappes de clavier, par rafales */
+  const key=()=>{if(!this.on)return;let t=c.currentTime;const n=Math.floor(rnd(3,14));
+   for(let i=0;i<n;i++){t+=rnd(.06,.2);const s=noise(),f=c.createBiquadFilter(),g=c.createGain();f.type='bandpass';f.frequency.value=rnd(2200,4200);f.Q.value=1.2;
+     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(rnd(.03,.07),t+.002);g.gain.exponentialRampToValueAtTime(.0001,t+.035);
+     s.connect(f).connect(g).connect(bus);s.start(t,Math.random());s.stop(t+.05)}
+   T(key,rnd(300,1600))};T(key,400);
+  /* double bip d'un appel qui arrive dans un casque */
+  const bip=()=>{if(!this.on)return;const t=c.currentTime;[0,.16].forEach((dt,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=i?1175:880;
+     g.gain.setValueAtTime(0,t+dt);g.gain.linearRampToValueAtTime(.035,t+dt+.01);g.gain.setTargetAtTime(0,t+dt+.09,.02);o.connect(g).connect(bus);o.start(t+dt);o.stop(t+dt+.3)});
+   T(bip,rnd(4000,11000))};T(bip,2500);
+  return true},
+ stop(){if(!this.on)return;this.on=false;this.timers.forEach(clearTimeout);this.timers=[];const c=this.ctx;
+  try{this.out.gain.setTargetAtTime(0,c.currentTime,.08)}catch(e){}
+  setTimeout(()=>c.close().catch(()=>{}),400);this.ctx=null;if(this.btn){this.btn.setAttribute('aria-pressed','false');$('small',this.btn).textContent=AMB_OFF;this.btn=null}}};
+const AMB_OFF='Écouter le fond sonore d\'un plateau en activité',AMB_ON='Son en cours · toucher pour couper';
+function ambiance(){
+  const w=el('div','poste'),b=el('button','pc',`<svg viewBox="0 0 64 64" aria-hidden="true"><path class="s-ff" d="M14,26 h10 l14,-11 v34 l-14,-11 h-10 z"/><path class="s-dm" d="M44,24 q6,8 0,16 M50,18 q11,14 0,28"/></svg><span><b>Ambiance sonore</b><small>${AMB_OFF}</small></span>`),
+    n=el('p','src','Ambiance de synthèse fabriquée par la page : brouhaha de voix, claviers, bips d\'appel. Ce n\'est pas un enregistrement, et aucune parole n\'est intelligible.');
+  b.type='button';b.setAttribute('aria-pressed','false');n.hidden=true;
+  b.onclick=()=>{if(AMB.on&&AMB.btn===b){AMB.stop();return}
+    AMB.stop();if(!AMB.start()){n.hidden=false;n.textContent='Ce navigateur ne permet pas de produire le son.';return}
+    AMB.btn=b;b.setAttribute('aria-pressed','true');$('small',b).textContent=AMB_ON;n.hidden=false};
+  w.append(b,n);return w}
+
 function openRoom(t,r,scroll){
-  CUR=r.id;const sc=$('#scene');sc.replaceChildren();
+  AMB.stop();CUR=r.id;const sc=$('#scene');sc.replaceChildren();
   $$('[data-room]').forEach(n=>n.classList.toggle('on',n.dataset.room===r.id));
   sc.append(el('p','mono',`${t.city} · ${r.q}`),el('h3',null,r.name));
   const box=el('div','script'),ctl=el('div','row'),next=el('button','btn','Suite'),skip=el('button','btn ghost','Tout afficher');next.type=skip.type='button';
@@ -884,7 +933,7 @@ function openRoom(t,r,scroll){
     if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
     else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
   act.hidden=true;act.append(el('p','task',r.act.task));ACTS[r.act.type](act,r.act,finish);
-  sc.append(box,ctl,...(r.kind==='open'?[poste()]:r.ergo?[ergo()]:[]),act,keep,nav);line();
+  sc.append(box,ctl,...(r.kind==='open'?[poste(),ambiance()]:r.ergo?[ergo()]:[]),act,keep,nav);line();
   if(scroll)sc.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 
@@ -898,6 +947,7 @@ function refresh(){
   $$('#rooms button').forEach(b=>$('.c',b).textContent=DONE.has(b.dataset.room)?'✓':'');
 }
 function route(){
+  AMB.stop();
   const t=SITES.find(s=>s.id===location.hash.slice(1));
   $('#v-carte').hidden=!!t;$('#v-site').hidden=!t;
   $('#crumb').textContent=t?`Carte › ${t.city}`:'Carte des implantations';
