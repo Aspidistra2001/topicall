@@ -147,6 +147,19 @@ svg{display:block;width:100%;height:auto}
 
 .board{display:flex;flex-wrap:wrap;gap:4px 22px;align-items:baseline;padding:10px 14px;border-radius:8px;background:#141c33;color:#cfd8ee;font-family:var(--mono);font-size:.78rem}
 .board b{color:#7fe0b0;font-weight:500;font-size:1.05rem;margin-right:4px}
+button.board{border:1px solid transparent;text-align:left;width:100%;cursor:pointer}
+button.board:hover,button.board[aria-expanded="true"]{border-color:var(--accent)}
+.board .more{margin-left:auto;color:#ffb98a;text-decoration:underline;text-underline-offset:3px}
+.suivi{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.suivi table{font-variant-numeric:tabular-nums}
+.suivi td small{color:var(--muted)}
+.suivi td.lo{color:var(--bad);font-weight:700}
+.suivi tr.on{background:var(--accent-soft)}
+.suivi .in{display:flex;flex-direction:column;gap:8px;max-width:70ch}
+.suivi ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.suivi .src{font-size:.82rem;color:var(--muted)}
+.ecoute{padding:10px 12px;border-left:3px solid var(--line);color:var(--muted);max-width:70ch}
+.ecoute.on{border-left-color:var(--bad);background:var(--bad-soft);color:var(--ink)}
 .desks{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:8px}
 .desk{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 10px;align-items:center;text-align:left;padding:10px 10px 10px 12px;border:1px solid var(--line);border-left:4px solid var(--st);border-radius:8px;background:var(--surface)}
 .desk:hover{border-color:var(--accent);border-left-color:var(--st)}
@@ -754,15 +767,38 @@ function classify(root,c,done){const sc=scoreLine();
   c.items.forEach(it=>{const card=el('div','item');card.append(el('div',null,it.t),qa(it,c.cats,g=>{if(sc.add(g,c.items.length))done()}));root.append(card)});
   root.append(sc.p)}
 const STAT=[['call','En appel'],['wrap','Post-appel'],['call','En appel'],['free','Disponible'],['call','En appel'],['pause','En pause']];
+/* console de supervision : ce que l'encadrement voit et écoute. Indicateurs du cas, chiffres inventés. */
+function suivi(c){const pad=n=>String(n).padStart(2,'0'),box=el('div','suivi'),live=el('p','ecoute','Aucune écoute en cours. Choisissez un poste dans la colonne « Écoute ».');
+  const rows=c.items.map((it,i)=>{const ap=19+(i*7+3)%10,du=92+(i*23)%50,tx=6+(i*5)%9,et=2+(i*3)%4;
+    return `<tr><td><b>${it.who}</b><br><small>${STAT[i%6][1]}</small></td><td class="${ap<25?'lo':''}">${ap}</td><td class="${du>=120?'lo':''}">${Math.floor(du/60)} min ${pad(du%60)}</td><td>${tx} %</td><td>${et} / 5</td><td><button type="button" class="cat" data-w="${it.who}">Écouter</button></td></tr>`}).join('');
+  box.innerHTML=`<p class="mono">Console de supervision · vue du chef d'équipe</p>
+  <div class="tw"><table><tr><th>Poste</th><th>Appels / h<br>objectif 25</th><th>Durée moyenne<br>repère 2 min</th><th>Réponses favorables</th><th>Étape du script atteinte</th><th>Écoute</th></tr>${rows}</table></div>`;
+  box.append(live,el('div','in',`<p><b>Ce qui est suivi, d'après les annexes du cas</b></p>
+  <ul><li><b>Le rythme</b> : 25 appels par heure en moyenne, sachant que 80 % durent moins de deux minutes.</li>
+  <li><b>La durée</b> : un objectif de durée moyenne d'appel. Les scripts sont chronométrés à l'avance pour programmer les appels.</li>
+  <li><b>Le résultat</b> : un taux de réponses favorables.</li>
+  <li><b>Le respect du script</b> : l'étape atteinte dans le plan d'appel, qui défile à l'écran du téléconseiller.</li>
+  <li><b>Le contenu des appels</b> : des écoutes régulières, au hasard, sans prévenir. Les téléconseillers savent qu'elles existent, car on le leur rappelle chaque année, mais pas quand elles ont lieu.</li>
+  <li><b>L'enchaînement</b> : c'est le système d'information qui lance les appels et affiche le profil du client.</li></ul>
+  <p><b>À quoi cela sert, et ce que cela produit</b></p>
+  <ul><li>Pour l'entreprise : garantir la qualité vendue aux clients, tenir les engagements pris dans les contrats, repérer les besoins de formation. Les écoutes ne sont pas nominatives et servent à faire progresser l'équipe.</li>
+  <li>Pour le téléconseiller : un travail mesuré en continu, peu de marges de manœuvre, et le sentiment de pouvoir être entendu à tout moment. Ce sont des facteurs de risques psychosociaux (autonomie, intensité, rapports sociaux).</li></ul>
+  <p><b>Le cadre à respecter</b> : les salariés sont informés à l'avance du dispositif et de son but, les représentants du personnel sont consultés, la surveillance reste proportionnée à l'objectif poursuivi et ne devient pas permanente, et les données collectées sont protégées.</p>
+  <p class="src">Les indicateurs sont ceux du cas. Les chiffres du tableau sont inventés pour l'illustration ; en rouge, ceux qui s'écartent de l'objectif.</p>`));
+  box.onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;$$('tr',box).forEach(r=>r.classList.remove('on'));b.closest('tr').classList.add('on');
+    live.classList.add('on');live.innerHTML=`<b>Écoute en cours : ${b.dataset.w}.</b> Vous entendez l'appel et vous suivez à l'écran l'étape du script. Rien ne signale l'écoute sur ce poste.`};
+  return box}
 function plateau(root,c,done){const N=c.items.length,live=c.items.filter((_,i)=>STAT[i%6][0]==='call').length,
-  board=el('div','board',`<span><b>25</b>appels par heure visés</span><span><b>80 %</b>des appels sous 2 min</span><span><b>${live}/${N}</b>en ligne</span>`),
+  board=el('button','board',`<span><b>25</b>appels par heure visés</span><span><b>80 %</b>des appels sous 2 min</span><span><b>${live}/${N}</b>en ligne</span><span class="more">Voir le suivi des appels</span>`),sv=suivi(c),
   grid=el('div','desks'),bub=el('div','bubble','<p class="hint">Choisissez un poste pour écouter.</p>'),sc=scoreLine(),nodes=new Map();
+  board.type='button';board.setAttribute('aria-expanded','false');sv.hidden=true;
+  board.onclick=()=>{sv.hidden=!sv.hidden;board.setAttribute('aria-expanded',!sv.hidden);$('.more',board).textContent=sv.hidden?'Voir le suivi des appels':'Fermer le suivi'};
   c.items.forEach((it,i)=>{const[k,l]=STAT[i%6],b=el('button','desk st-'+k,`<span class="av" style="--sk:${SKIN[i%4]};--hr:${HAIR[(i*3+1)%4]}"></span><span class="nm">${it.who}</span><span class="st">${l}</span>`);b.type='button';
     b.onclick=()=>{$$('.desk',grid).forEach(x=>x.classList.remove('on'));b.classList.add('on');
       if(!nodes.has(it)){const n=el('div','qa');n.append(el('p',null,`<b>${it.who}</b> : « ${it.t} »`),qa(it,c.cats,g=>{b.classList.add(g?'ok':'ko');if(sc.add(g,N))done()}));nodes.set(it,n)}
       bub.replaceChildren(nodes.get(it))};
     grid.append(b)});
-  root.append(board,grid,bub,sc.p)}
+  root.append(board,sv,grid,bub,sc.p)}
 function pick(root,c,done){const head=el('p','score'),list=el('div','opts'),go=el('button','btn','Valider mes choix'),sel=new Set(),cap=c.budget||c.max;
   const used=()=>[...sel].reduce((a,i)=>a+(c.budget?c.opts[i].cost:1),0);
   const upd=()=>{head.textContent=c.budget?`${used()} point${used()>1?'s':''} engagé${used()>1?'s':''} sur ${cap}`:`${sel.size} choix sur ${cap}`;go.disabled=!sel.size};
