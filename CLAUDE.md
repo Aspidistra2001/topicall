@@ -4,10 +4,14 @@ Corrigé joué du cas TopiCall (Nathalie Dumouchel, 2024, Prix du Cas AGRH 2024)
 
 Page publiée : https://claude.ai/artifact/3pLmenV3LiMAb5EpsyR6si (privée tant qu'elle n'est pas partagée).
 
+Copie sur le site : https://argospanoptes.fr/topicall-725e97d0/ (non répertoriée, non indexée, ouverte à toute personne ayant le lien). Elle ne se met pas à jour seule : voir « Mettre à jour la copie du site ».
+
 ## Fichiers
 
 - `index.html` : source de la page publiée. C'est un fragment (pas de `<!doctype>`, `<html>`, `<head>` ni `<body>` : ils sont ajoutés à la publication). Tout est dans ce fichier : CSS, données, moteur de rendu.
 - `apercu.html` : la même page enveloppée dans un document complet, pour l'ouvrir en local dans un navigateur. À régénérer après chaque modification de `index.html` (voir plus bas).
+- `export-site.js` : fabrique la version autonome pour argospanoptes.fr.
+- `img/` : vignettes des deux vidéos de l'introduction.
 - `check.js` : test Playwright qui régénère `apercu.html`, rejoue les 16 salles sur ordinateur et à largeur de téléphone, signale les erreurs et le débordement horizontal, et enregistre des captures.
 - `livret-td.pdf` : le livret étudiant 2026-2027, source des énoncés. Diffusion interdite sans autorisation.
 
@@ -41,6 +45,14 @@ node check.js
 ```
 
 Le script demande Playwright et Chromium. Il écrit `apercu.html` et des captures `d-*.png` (ordinateur) et `m-*.png` (téléphone) dans ce dossier.
+
+## Mettre à jour la copie du site
+
+```bash
+node export-site.js ../argospanoptes/topicall-725e97d0
+```
+
+`export-site.js` écrit la page autonome (document complet, balise `noindex`, polices locales du site, images) dans le dossier donné. Il reste à committer ce dossier dans le dépôt `argospanoptes` et à pousser sur `main` : Cloudflare Pages republie à chaque push. Ne pas ajouter la page au menu, à `sitemap.xml` ni à `robots.txt`.
 
 ## Contraintes de la page publiée
 
