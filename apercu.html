@@ -249,6 +249,27 @@ th{font-family:var(--mono);font-weight:500;font-size:.75rem;letter-spacing:.04em
 .btm{display:inline-block;min-width:1.6em;text-align:center;font-family:var(--mono);font-weight:500;font-size:.85em;border-radius:4px;padding:0 4px;margin-right:8px;color:var(--surface);background:var(--plan)}
 .btm-T{background:var(--good)} .btm-M{background:var(--accent)}
 details.keep ul.btml{list-style:none;padding-left:0}
+.theo .fam{font-family:var(--display);font-weight:700;font-size:1.05rem;margin-top:6px}
+.th-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;list-style:none;margin:0;padding:0}
+.th-g li{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);min-width:0}
+.th-g details{margin-top:auto;border-top:1px solid var(--line);padding-top:8px}
+.th-g summary{cursor:pointer;font-weight:700;color:var(--plan)}
+.th-g details p{margin-top:6px}
+.th-g .src,.theo .lg{font-size:.82rem;color:var(--muted)}
+.theo .lg{font-family:var(--mono);font-size:.72rem}
+.dgw{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.dgw svg{max-width:300px;align-self:center}
+.dg{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;font-size:.82rem}
+.dg.top{align-items:stretch}.dg.top .ar{align-self:center}
+.dg .col{display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:0;flex:1 1 0}
+.bx{padding:4px 8px;border:1.5px solid var(--plan);border-radius:6px;background:var(--plan-fill);text-align:center}
+.bx.rd{border-radius:999px;border-color:var(--accent);background:var(--accent-soft)}
+.dg .ar{color:var(--accent);font-weight:700}
+.dg.eq{gap:12px;font-size:1rem}
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--display);font-size:1.15rem}
+.frac i{font-style:normal;padding:0 8px}.frac i+i{border-top:2px solid var(--ink)}
+.t-w{fill:var(--plan);fill-opacity:.22;stroke:var(--plan);stroke-width:1.5}
+.theo .fourn ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;max-width:68ch}
 footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-block:16px 32px}
 </style>
 
@@ -535,10 +556,10 @@ const SITES=[
   act:{type:'plateau',task:'À quelle famille de facteurs se rattache chaque verbatim ?',cats:[['b','Besoins de l\'individu'],['t','Le travail lui-même'],['m','Système de management']],items:[
    {who:'Poste 1',t:'Tous les sites ne sont pas traités à la même enseigne, certains ont des campagnes d\'appels plus intéressantes que d\'autres.',a:'m',why:'Sentiment d\'iniquité : on se compare aux autres (théorie de l\'équité d\'Adams).'},
    {who:'Poste 2',t:'Beau métier si on aime la relation client ! Mais des fois, c\'est dur d\'avoir beaucoup de « Non ».',a:'t',why:'Le contenu du travail : son sens, et le retour, souvent négatif, que l\'on reçoit (Hackman et Oldham).'},
-   {who:'Poste 3',t:'Mon manager fait ce qu\'il peut pour nous encourager, mais il n\'a pas de marges de manœuvre. Qu\'on bosse bien ou pas, ça ne fait pas de différence sur la fiche de paye.',a:'m',why:'Aucun lien entre la performance et la récompense : c\'est l\'instrumentalité de Vroom qui fait défaut.'},
-   {who:'Poste 4',t:'Franchement, on est bien à TopiCall, et si certains ne s\'en rendent pas compte, c\'est qu\'ils ont trop l\'habitude de se plaindre.',a:'b',why:'Besoins de sécurité et de bonnes conditions satisfaits : des facteurs d\'hygiène, chez Herzberg.'},
-   {who:'Poste 5',t:'À quoi ça sert de nous coller des objectifs qu\'on ne pourra pas atteindre ? Au final, on a l\'impression d\'être nuls.',a:'m',why:'Un objectif motive s\'il est difficile mais atteignable (Locke). Ici l\'effort ne mène pas au résultat (Vroom), et l\'estime de soi en souffre.'},
-   {who:'Poste 6',t:'L\'équipe est top, c\'est pour les voir que je me lève le matin.',a:'b',why:'Besoin d\'appartenance (Maslow).'},
+   {who:'Poste 3',t:'Mon manager fait ce qu\'il peut pour nous encourager, mais il n\'a pas de marges de manœuvre. Qu\'on bosse bien ou pas, ça ne fait pas de différence sur la fiche de paye.',a:'m',why:'La récompense ne suit pas le comportement : la « carotte » des théories béhavioristes n\'est reliée à rien. S\'y ajoute un sentiment d\'iniquité (Adams).'},
+   {who:'Poste 4',t:'Franchement, on est bien à TopiCall, et si certains ne s\'en rendent pas compte, c\'est qu\'ils ont trop l\'habitude de se plaindre.',a:'b',why:'Les besoins de sécurité sont satisfaits (Maslow) ; c\'est le besoin d\'existence chez Alderfer.'},
+   {who:'Poste 5',t:'À quoi ça sert de nous coller des objectifs qu\'on ne pourra pas atteindre ? Au final, on a l\'impression d\'être nuls.',a:'m',why:'Un objectif hors d\'atteinte ne récompense jamais l\'effort (théories béhavioristes). Il contrarie aussi le besoin d\'accomplissement (McClelland) : « l\'impression d\'être nuls ».'},
+   {who:'Poste 6',t:'L\'équipe est top, c\'est pour les voir que je me lève le matin.',a:'b',why:'Besoin d\'appartenance chez Maslow, de sociabilité chez Alderfer, d\'affiliation chez McClelland.'},
    {who:'Poste 7',t:'Ce qui manque surtout, c\'est un peu d\'espoir de faire autre chose sans avoir à déménager à l\'autre bout de la France.',a:['b','m'],why:'Besoin d\'accomplissement et de progression. La réponse relève du management : la gestion des carrières.'}]},
   keep:`<p><b>Le classement des résultats de l'enquête</b> : <span class="btm btm-B">B</span>besoins des individus · <span class="btm btm-T">T</span>le travail lui-même · <span class="btm btm-M">M</span>système de management.</p>
   <p class="mono">Les neuf affirmations du questionnaire</p>
@@ -547,9 +568,10 @@ const SITES=[
   <ul class="btml"><li><span class="btm btm-M">M</span>« Tous les sites ne sont pas traités à la même enseigne… »</li><li><span class="btm btm-T">T</span>« Beau métier si on aime la relation client ! Mais des fois, c'est dur d'avoir beaucoup de “Non”… »</li><li><span class="btm btm-M">M</span>« Mon manager fait ce qu'il peut pour nous encourager, mais il n'a pas de marges de manœuvre. Qu'on bosse bien ou pas, ça ne fait pas de différence sur la fiche de paye. »</li><li><span class="btm btm-B">B</span>« Franchement, on est bien à TopiCall… »</li><li><span class="btm btm-M">M</span>« À quoi ça sert de nous coller des objectifs qu'on ne pourra pas atteindre ?… »</li><li><span class="btm btm-B">B</span>« L'équipe est top, c'est pour les voir que je me lève le matin. »</li><li><span class="btm btm-B">B</span>« Ce qui manque surtout, c'est un peu d'espoir de faire autre chose sans avoir à déménager… »</li></ul>
   <p>Deux classements se discutent : la <b>reconnaissance</b> et les <b>opportunités d'évolution</b> répondent à des besoins (estime, accomplissement), mais elles dépendent de décisions de management (rémunération, gestion des carrières). Un classement en M est recevable s'il est justifié.</p>
   <div class="tw"><table><tr><th>Famille</th><th>Théories</th><th>Chez TopiCall</th></tr>
-  <tr><td>Besoins de l'individu</td><td>Maslow, Herzberg</td><td>Appartenance et sécurité satisfaites ; estime et accomplissement en manque (reconnaissance 32 %, évolution 41 %)</td></tr>
-  <tr><td>Le travail lui-même</td><td>Hackman et Oldham ; Ryan et al.</td><td>Travail intéressant pour 55 % ; autonomie faible (38 %) ; objectifs qui permettent mal un travail de qualité (39 %) ; retours surtout négatifs des prospects</td></tr>
-  <tr><td>Système de management</td><td>Vroom, Adams, Locke</td><td>Qualité de vie au travail jugée meilleure qu'ailleurs (67 %) et soutien du manager (69 %) ; mais objectifs dits inatteignables dans les verbatims, pas de lien effort-récompense, doute sur l'équité (44 %)</td></tr></table></div>
+  <tr><td>Besoins de l'individu</td><td>Maslow, Alderfer, McClelland</td><td>Appartenance et sécurité satisfaites ; estime et accomplissement en manque (reconnaissance 32 %, évolution 41 %)</td></tr>
+  <tr><td>Le travail lui-même</td><td>Herzberg, Hackman et Oldham ; motivation intrinsèque (Ryan et al.)</td><td>Travail intéressant pour 55 % ; autonomie faible (38 %) ; objectifs qui permettent mal un travail de qualité (39 %) ; retours surtout négatifs des prospects</td></tr>
+  <tr><td>Système de management</td><td>Théories béhavioristes, Adams</td><td>Qualité de vie au travail jugée meilleure qu'ailleurs (67 %) et soutien du manager (69 %) ; mais objectifs dits inatteignables dans les verbatims, pas de lien effort-récompense, doute sur l'équité (44 %)</td></tr></table></div>
+  <p>Le détail de chaque théorie se trouve sur le plateau, sous le bouton « Théories de la motivation ».</p>
   <p>Lecture avec Herzberg : TopiCall a soigné les <b>facteurs d'hygiène</b> (conditions, relations, encadrement), ce qui évite l'insatisfaction. Les <b>facteurs moteurs</b> (reconnaissance, responsabilité, évolution, intérêt du travail) restent faibles, et ce sont eux qui motivent.</p>
   <p>La <b>motivation intrinsèque</b> se travaille directement sur le plateau : ouvrez le bouton « Motivation intrinsèque », au-dessus des postes.</p>
   <p>Certains verbatims se rattachent à deux familles : l'important est de justifier le classement.</p>`},
@@ -943,6 +965,54 @@ function intrinseque(){
   b.type='button';b.setAttribute('aria-expanded','false');m.hidden=true;
   b.onclick=()=>{m.hidden=!m.hidden;b.setAttribute('aria-expanded',!m.hidden)};
   w.append(b,m);return w}
+/* ---- théories de la motivation : les sept théories du cours, replacées dans le contexte de TopiCall (plateau de Lyon) ---- */
+const THEO=[
+ ['B','Théories centrées sur les besoins',[
+  ['Maslow','La hiérarchie des besoins',
+   `<svg viewBox="0 0 260 104" role="img" aria-label="Cinq courbes qui se chevauchent : les besoins émergent progressivement, l'un avant que le précédent soit comblé">${[0,1,2,3,4].map(i=>`<path class="t-w" d="M${8+i*44},88 Q${52+i*44},-18 ${96+i*44},88 Z"/><text class="s-tx" x="${52+i*44}" y="30" text-anchor="middle">${i+1}</text>`).join('')}<path class="s-fu" d="M4,88 H254 M248,83 L255,88 L248,93" stroke-width="1.5"/></svg><p class="lg">1 physiologiques · 2 sécurité · 3 appartenance · 4 estime · 5 accomplissement</p>`,
+   'Cinq familles de besoins, des plus élémentaires aux plus élevés. Un besoin satisfait cesse de motiver et le suivant prend le relais. Maslow précise lui-même que le passage est progressif : un besoin apparaît avant que le précédent soit entièrement comblé.',
+   'Sécurité (CDI, conditions de travail) et appartenance (collaboration : 79 %) sont bien couvertes. L\'estime (reconnaissance : 32 %) et l\'accomplissement (évolution : 41 %) ne le sont pas : c\'est là que se joue désormais la motivation.',
+   'Peu vérifiée par les faits, et l\'ordre des besoins varie selon les personnes et les cultures.'],
+  ['Alderfer','La théorie ESC (ERG en anglais)',
+   `<div class="dg"><span class="bx">Existence</span><span class="ar">⇄</span><span class="bx">Sociabilité</span><span class="ar">⇄</span><span class="bx">Croissance</span></div>`,
+   'Trois besoins au lieu de cinq, qui peuvent agir en même temps. Quand un besoin élevé reste frustré, la personne se replie sur un besoin plus bas et en demande davantage : c\'est la régression.',
+   'La croissance est bloquée (« un peu d\'espoir de faire autre chose »). On peut alors lire autrement le poids de l\'équipe (« c\'est pour les voir que je me lève ») et les remarques sur la fiche de paye : un report sur la sociabilité et l\'existence.',
+   'Catégories larges, difficiles à mesurer séparément.'],
+  ['McClelland (1961)','Les besoins acquis',
+   `<div class="dg"><span class="bx rd">Accomplissement</span><span class="bx rd">Affiliation</span><span class="bx rd">Pouvoir</span></div>`,
+   'Trois besoins appris au fil de l\'expérience, présents chez chacun à des degrés différents : réussir ce que l\'on entreprend, être en lien avec les autres, avoir de l\'influence.',
+   'L\'affiliation est nourrie par l\'équipe. L\'accomplissement est contrarié par des objectifs hors d\'atteinte (« on a l\'impression d\'être nuls »). Le pouvoir manque jusqu\'aux chefs d\'équipe, qui n\'ont « pas de marges de manœuvre ».',
+   'Le profil de chacun se mesure mal ; la théorie sert surtout à adapter les missions aux personnes.']]],
+ ['T','Théories centrées sur le travail',[
+  ['Herzberg (1959, 1971)','Les deux facteurs',
+   `<div class="dg"><span class="bx">Insatisfaction</span><span class="ar">⟷</span><span class="bx">Pas d'insatisfaction</span></div><p class="lg">Facteurs d'hygiène : salaire, conditions de travail, relations, encadrement, sécurité</p><div class="dg"><span class="bx">Pas de satisfaction</span><span class="ar">⟷</span><span class="bx">Satisfaction</span></div><p class="lg">Facteurs moteurs : accomplissement, reconnaissance, travail lui-même, responsabilité, évolution</p>`,
+   'Satisfaction et insatisfaction ne sont pas les deux bouts d\'une même échelle. Les facteurs d\'hygiène évitent le mécontentement sans motiver. Seuls les facteurs moteurs, liés au contenu du travail, motivent.',
+   'TopiCall a soigné l\'hygiène : conditions, équipe, soutien du manager (69 %). Les moteurs sont faibles : reconnaissance (32 %), autonomie (38 %), évolution (41 %). D\'où des salariés qui ne se plaignent pas, sans être mobilisés.',
+   'La méthode d\'enquête pousse à s\'attribuer les réussites et à imputer les échecs à l\'entreprise.'],
+  ['Hackman et Oldham','Les caractéristiques de la tâche',
+   `<div class="dg top"><span class="col"><span class="bx">Variété des compétences</span><span class="bx">Identité de la tâche</span><span class="bx">Sens de la tâche</span><span class="bx">Autonomie</span><span class="bx">Retour sur le travail</span></span><span class="ar">→</span><span class="col"><span class="bx">Un travail qui a du sens</span><span class="bx">Se sentir responsable</span><span class="bx">Connaître ses résultats</span></span><span class="ar">→</span><span class="col"><span class="bx rd">Motivation, satisfaction, qualité du travail</span></span></div>`,
+   'Cinq caractéristiques d\'un poste produisent trois états psychologiques, qui produisent à leur tour motivation et qualité. Un poste se conçoit, donc se modifie : c\'est l\'enrichissement du travail.',
+   'L\'autonomie est faible (38 %, script et écoutes). Le retour sur le travail est surtout négatif : « beaucoup de Non ». La variété dépend des campagnes confiées au site. Le sens tient : « beau métier si on aime la relation client ».',
+   'L\'effet dépend du besoin de développement de chacun : tout le monde ne souhaite pas un poste enrichi.']]],
+ ['M','Théories centrées sur le système de management',[
+  ['Théories béhavioristes','La carotte et le bâton',
+   `<div class="dg"><span class="bx">Comportement</span><span class="ar">→</span><span class="col"><span class="bx">Récompense : il se répète</span><span class="bx">Sanction : il s'arrête</span></span></div>`,
+   'Un comportement suivi d\'une conséquence agréable se répète ; suivi d\'une conséquence désagréable, il disparaît. Le management agit donc par les récompenses et les sanctions.',
+   'La carotte n\'est reliée à rien : « qu\'on bosse bien ou pas, ça ne fait pas de différence sur la fiche de paye ». Le bâton, lui, est présent : objectifs chiffrés, écoutes. Et un objectif que l\'on ne peut pas atteindre ne récompense jamais l\'effort.',
+   'Ignore le sens que la personne donne à son travail ; la récompense peut finir par remplacer l\'intérêt pour la tâche.'],
+  ['Adams (1963, 1965)','La théorie de l\'équité',
+   `<div class="dg eq"><span class="frac"><i>A<sub>p</sub></i><i>C<sub>p</sub></i></span><span>comparé à</span><span class="frac"><i>A<sub>a</sub></i><i>C<sub>a</sub></i></span></div><p class="lg">A : avantage · C : contribution · p : personnel·le · a : autre personne</p>`,
+   'Chacun compare ce qu\'il reçoit à ce qu\'il apporte, puis compare ce rapport à celui des autres. S\'il se juge lésé, il rétablit l\'équilibre : il réduit son effort, réclame, ou s\'en va.',
+   '« Tous les sites ne sont pas traités à la même enseigne » : la comparaison se fait entre plateformes. Seuls 44 % jugent le management juste et équitable, alors que 69 % apprécient leur propre manager : le doute porte sur l\'entreprise, pas sur le chef d\'équipe.',
+   'Le sentiment d\'équité est subjectif : il dépend de la personne à laquelle on choisit de se comparer.']]]];
+function theories(){
+  const w=el('div','poste'),b=el('button','pc',`<svg viewBox="0 0 64 64" aria-hidden="true"><path class="t-w" d="M6,52 Q20,4 34,52 Z"/><path class="t-w" d="M20,52 Q34,4 48,52 Z"/><path class="t-w" d="M34,52 Q48,4 62,52 Z"/><path class="s-fu" d="M4,52 H60" stroke-width="2"/></svg><span><b>Théories de la motivation</b><small>Sept théories du cours : ce qu'elles disent, puis ce qu'elles éclairent chez TopiCall</small></span>`),
+    m=el('div','ergo theo');
+  m.innerHTML=THEO.map(([k,fam,list])=>`<p class="fam"><span class="btm btm-${k}">${k}</span>${fam}</p><ul class="th-g">${list.map(([n,sub,dg,idea,ctx,lim])=>`<li><p><b>${n}</b> · ${sub}</p><div class="dgw">${dg}</div><p>${idea}</p><details><summary>Et chez TopiCall ?</summary><p>${ctx}</p><p class="src">Limite : ${lim}</p></details></li>`).join('')}</ul>`).join('')+
+   `<div class="fourn"><p><b>Ce qu'il faut en retenir.</b> Malgré leurs biais, ces théories donnent des leviers d'organisation puissants pour motiver. Elles montrent aussi, à l'inverse, combien les sources de démotivation sont nombreuses.</p><ul><li><b>L'importance d'autrui</b> : la motivation a une dimension sociale (appartenance, affiliation, comparaison avec les autres).</li><li><b>La relation à la tâche</b> et aux conditions dans lesquelles on l'effectue : contenu du travail, autonomie, retours, environnement.</li></ul></div>`;
+  b.type='button';b.setAttribute('aria-expanded','false');m.hidden=true;
+  b.onclick=()=>{m.hidden=!m.hidden;b.setAttribute('aria-expanded',!m.hidden)};
+  w.append(b,m);return w}
 function openRoom(t,r,scroll){
   CUR=r.id;const sc=$('#scene');sc.replaceChildren();
   $$('[data-room]').forEach(n=>n.classList.toggle('on',n.dataset.room===r.id));
@@ -959,7 +1029,7 @@ function openRoom(t,r,scroll){
     if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
     else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
   act.hidden=true;act.append(el('p','task',r.act.task));ACTS[r.act.type](act,r.act,finish);
-  sc.append(box,ctl,...(r.kind==='open'?[poste(),...(t.id==='marne'?[terrain()]:[]),...(t.id==='lyon'?[intrinseque()]:[])]:r.ergo?[ergo()]:[]),act,keep,nav);line();
+  sc.append(box,ctl,...(r.kind==='open'?[poste(),...(t.id==='marne'?[terrain()]:[]),...(t.id==='lyon'?[theories(),intrinseque()]:[])]:r.ergo?[ergo()]:[]),act,keep,nav);line();
   if(scroll)sc.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 
