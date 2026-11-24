@@ -756,7 +756,8 @@ const ACTS={classify,plateau,pick,spot};
 /* ---- poste de travail : le plan d'appel défile à l'écran ---- */
 /* Une ligne qui commence par « > » est une consigne affichée au téléconseiller, les autres sont à dire. */
 const CALL={camp:'Campagne « Rendez-vous épargne » · appels sortants',steps:[
- ['Présentation',['« Bonjour, <i>[Prénom]</i> à l\'appareil. Je vous appelle de la part de <i>[Banque]</i>, votre banque. »','> Sourire dans la voix, débit posé.']],
+ ['Sécurité',['« Bonjour. Avant toute chose : vous n\'êtes pas en train de conduire ? »','> Si la personne conduit : proposer un rappel, noter le créneau et raccrocher sans attendre.']],
+ ['Présentation',['« <i>[Prénom]</i> à l\'appareil. Je vous appelle de la part de <i>[Banque]</i>, votre banque. »','> Sourire dans la voix, débit posé.']],
  ['Interlocuteur et disponibilité',['« Je suis bien avec <i>[Civilité Nom]</i> ? Avez-vous deux minutes à m\'accorder ? »','> Si non : proposer un rappel et noter le créneau.']],
  ['Motif de l\'appel',['« Votre conseiller, <i>[Conseiller]</i>, souhaite faire le point avec vous sur votre épargne. Je vous appelle pour convenir d\'un rendez-vous. »']],
  ['Découverte',['« À quand remonte votre dernier rendez-vous en agence ? »','« Avez-vous un projet dans les mois qui viennent : logement, études des enfants, retraite ? »','> Laisser répondre, reformuler en une phrase.']],
