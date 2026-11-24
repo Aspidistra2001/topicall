@@ -161,6 +161,7 @@ svg{display:block;width:100%;height:auto}
 .bubble{min-height:5em;padding:14px;border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;gap:10px}
 .hint{color:var(--muted)}
 
+.grp{font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--plan);margin-top:8px}
 .opts{display:flex;flex-direction:column;gap:8px}
 .opt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
 .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
@@ -365,25 +366,31 @@ const SITES=[
   script:[['Claire, DRH','Le groupe de travail est réuni : deux téléconseillers, une cheffe d\'équipe, une élue, le responsable Qualité.'],
    ['Claire, DRH','L\'entreprise tourne bien, mais tout ne passera pas. Vous avez 10 points de budget.'],
    ['','Mettre à jour le document unique et associer les élus et le service de santé au travail n\'est pas une option : c\'est hors budget.']],
-  act:{type:'pick',budget:10,task:'Composez votre plan d\'actions sans dépasser 10 points.',opts:[
-   {t:'Compléter le « 25 appels par heure » par des objectifs de qualité, discutés avec les équipes',cost:2,p:1,lvl:'good',tag:'Prévention primaire.',why:'Agit sur la cause principale de l\'intensité.'},
-   {t:'Horaires : équipes du matin sur volontariat, fins à 20 h réparties, plannings connus à l\'avance',cost:2,p:1,lvl:'good',tag:'Prévention primaire.',why:'Répond directement à la demande des parents de jeunes enfants.'},
-   {t:'Traitement acoustique du plateau et casques à limiteur de niveau sonore',cost:3,p:1,lvl:'good',tag:'Prévention primaire.',why:'Supprime le risque à la source ; c\'est l\'action la plus chère.'},
-   {t:'Sièges et écrans réglables, formation aux postures',cost:2,p:1,lvl:'good',tag:'Prévention primaire.',why:'Adapte le poste à la personne.'},
-   {t:'Scripts plus souples, rédigés avec des téléconseillers',cost:1,p:1,lvl:'good',tag:'Prévention primaire.',why:'Redonne de l\'autonomie pour un coût faible.'},
-   {t:'Écoutes encadrées : règles connues, retour individuel à visée de formation, élus consultés',cost:1,p:1,lvl:'good',tag:'Prévention primaire.',why:'Transforme un contrôle subi en outil de progression, et sécurise le dispositif sur le plan juridique.'},
-   {t:'Droit de mettre fin à un appel injurieux, temps de récupération ensuite',cost:1,p:1,lvl:'good',tag:'Prévention primaire.',why:'Réduit l\'exposition à l\'agressivité.'},
-   {t:'Formation à la gestion des appels difficiles',cost:2,p:0,lvl:'mid',tag:'Prévention secondaire.',why:'Utile, mais elle aide à supporter le risque sans le réduire.'},
-   {t:'Temps d\'échange réguliers en équipe sur les appels difficiles',cost:1,p:0,lvl:'mid',tag:'Prévention secondaire.',why:'Renforce le soutien du collectif, déjà réel.'},
-   {t:'Cellule d\'écoute psychologique externe',cost:2,p:0,lvl:'mid',tag:'Prévention tertiaire.',why:'Prend en charge des personnes déjà en difficulté : nécessaire en complément, jamais seule.'},
-   {t:'Séances de sophrologie sur site',cost:2,p:0,lvl:'mid',tag:'Prévention secondaire.',why:'Agit sur l\'individu, pas sur l\'organisation du travail.'},
-   {t:'Baby-foot et corbeille de fruits en salle de pause',cost:1,p:0,lvl:'bad',tag:'Hors sujet.',why:'Ne répond à aucun des facteurs de risque relevés.'}],
-   summary:s=>{const T=s.reduce((a,o)=>a+o.cost,0),P=s.filter(o=>o.p).reduce((a,o)=>a+o.cost,0),r=P/T;
-    return `<b>${P} point${P>1?'s':''} sur ${T}</b> agissent sur les causes. `+(r>=.7?'Votre plan s\'attaque à l\'organisation du travail : c\'est la logique attendue.':r>=.4?'Plan équilibré, mais une bonne part du budget aide les salariés à supporter des risques que l\'on pourrait réduire.':'Votre plan soigne surtout les effets. Les causes relevées sur le plateau (cadence, horaires, bruit, script, écoutes) restent en place.')}},
-  keep:`<p>Un plan d'actions se construit par niveaux de prévention :</p>
-  <ul><li><b>Primaire</b>, en priorité : supprimer ou réduire le risque à la source (objectifs, horaires, bruit, postes, scripts, écoutes).</li>
-  <li><b>Secondaire</b> : aider les salariés à faire face (formation, échanges entre pairs).</li>
-  <li><b>Tertiaire</b> : prendre en charge ceux qui sont atteints (cellule d'écoute, accompagnement au retour).</li></ul>
+   act:{type:'pick',budget:10,task:'Composez votre plan d\'actions sans dépasser 10 points, en couvrant les trois domaines.',
+    groups:{org:'Organisation du travail',mat:'Environnement matériel et technique',rel:'Relations de travail et bien-être'},opts:[
+    {g:'org',t:'Compléter le « 25 appels par heure » par des objectifs de qualité, discutés avec les équipes',cost:2,lvl:'good',tag:'Pertinent.',why:'Agit sur la cause principale de l\'intensité du travail.'},
+    {g:'org',t:'Horaires : équipes du matin sur volontariat, fins à 20 h réparties, plannings connus à l\'avance',cost:2,lvl:'good',tag:'Pertinent.',why:'Répond directement à la demande des parents de jeunes enfants.'},
+    {g:'org',t:'Scripts plus souples, rédigés avec des téléconseillers',cost:1,lvl:'good',tag:'Pertinent.',why:'Redonne de l\'autonomie pour un coût faible.'},
+    {g:'org',t:'Écoutes encadrées : règles connues, retour individuel à visée de formation, élus consultés',cost:1,lvl:'good',tag:'Pertinent.',why:'Transforme un contrôle subi en outil de progression, et sécurise le dispositif sur le plan juridique.'},
+    {g:'org',t:'Alterner les appels avec d\'autres tâches : formation, tutorat, préparation des campagnes',cost:1,lvl:'good',tag:'Pertinent.',why:'Rompt la monotonie et la cadence, et met à profit les périodes sans campagne.'},
+    {g:'org',t:'Droit de mettre fin à un appel injurieux, temps de récupération ensuite',cost:1,lvl:'good',tag:'Pertinent.',why:'Réduit l\'exposition à l\'agressivité des prospects.'},
+    {g:'mat',t:'Traitement acoustique du plateau et casques à limiteur de niveau sonore',cost:3,lvl:'good',tag:'Pertinent.',why:'Supprime le bruit à la source ; c\'est l\'action la plus chère.'},
+    {g:'mat',t:'Sièges et écrans réglables, repose-pieds, réglage du poste avec chaque salarié',cost:2,lvl:'good',tag:'Pertinent.',why:'Adapte le poste à la personne : mal de dos, nuque, fatigue visuelle.'},
+    {g:'mat',t:'Système d\'appels : un court délai entre deux appels, que le téléconseiller peut prolonger',cost:1,lvl:'good',tag:'Pertinent.',why:'L\'outil cesse d\'imposer seul la cadence.'},
+    {g:'mat',t:'Salle de pause isolée du bruit du plateau',cost:1,lvl:'good',tag:'Pertinent.',why:'Les cinq minutes de pause par heure deviennent un vrai temps de récupération.'},
+    {g:'rel',t:'Temps d\'échange réguliers en équipe sur les appels difficiles',cost:1,lvl:'good',tag:'Pertinent.',why:'S\'appuie sur le soutien du collectif, déjà réel chez TopiCall.'},
+    {g:'rel',t:'Former les chefs d\'équipe au soutien de leurs équipes, et les téléconseillers aux appels difficiles',cost:2,lvl:'good',tag:'Pertinent.',why:'Le manager de proximité est le premier recours après un appel agressif.'},
+    {g:'rel',t:'Cellule d\'écoute psychologique externe',cost:2,lvl:'mid',tag:'En complément.',why:'Prend en charge des personnes déjà en difficulté : utile, mais jamais seule.'},
+    {g:'rel',t:'Séances de sophrologie sur site',cost:2,lvl:'mid',tag:'En complément.',why:'Aide chacun à supporter le stress sans toucher à ce qui le produit.'},
+    {g:'rel',t:'Baby-foot et corbeille de fruits en salle de pause',cost:1,lvl:'bad',tag:'Hors sujet.',why:'Ne répond à aucun des facteurs de risque relevés.'}],
+    summary:s=>{const G={org:'l\'organisation du travail',mat:'l\'environnement matériel et technique',rel:'les relations de travail et le bien-être'},pt=k=>s.filter(o=>o.g===k).reduce((a,o)=>a+o.cost,0),miss=Object.keys(G).filter(k=>!pt(k)),soft=s.filter(o=>o.lvl!=='good').reduce((a,o)=>a+o.cost,0);
+     return `<b>Organisation : ${pt('org')} · Matériel et technique : ${pt('mat')} · Relations et bien-être : ${pt('rel')}</b> (en points). `+(miss.length?`Votre plan laisse de côté ${miss.map(k=>G[k]).join(' et ')} : les risques relevés sur le plateau touchent pourtant les trois domaines.`:pt('org')<4?'Les trois domaines sont couverts, mais l\'organisation du travail pèse peu alors que la plupart des risques en viennent (cadence, horaires, script, écoutes).':'Les trois domaines sont couverts et l\'organisation du travail est au centre : c\'est la logique attendue.')+(soft>=4?' Une part importante du budget aide les salariés à supporter les risques plutôt qu\'à les réduire.':'')}},
+  keep:`<p>Un plan d'actions sur les conditions de travail couvre <b>trois domaines</b> :</p>
+  <div class="tw"><table><tr><th>Domaine</th><th>Risques visés</th><th>Actions</th></tr>
+  <tr><td><b>Organisation du travail</b></td><td>Cadence, objectifs, horaires, faible autonomie, contrôle, agressivité des prospects</td><td>Objectifs de qualité à côté des 25 appels par heure · horaires stabilisés et choisis quand c'est possible · scripts plus souples · écoutes encadrées · alternance des tâches · droit de couper un appel injurieux</td></tr>
+  <tr><td><b>Environnement matériel et technique</b></td><td>Bruit, posture assise, travail sur écran, cadence imposée par le système</td><td>Traitement acoustique et casques à limiteur · sièges et écrans réglables · délai entre deux appels · salle de pause au calme</td></tr>
+  <tr><td><b>Relations de travail et bien-être</b></td><td>Charge émotionnelle, isolement face aux refus, stress</td><td>Échanges en équipe sur les appels difficiles · formation des chefs d'équipe et des téléconseillers · cellule d'écoute en complément</td></tr></table></div>
+  <p>Dans chaque domaine, on commence par ce qui réduit le risque à la source ; les actions qui aident à le supporter ou qui prennent en charge les personnes atteintes viennent en complément.</p>
   <p>Chaque action a un responsable, une échéance et un indicateur de suivi (absentéisme, turnover, résultats d'enquête).</p>
   <p><b>Enseignements de l'exercice</b></p>
   <ul><li>On diagnostique le travail réel, sur le terrain et avec ceux qui le font.</li>
@@ -759,7 +766,7 @@ function plateau(root,c,done){const N=c.items.length,live=c.items.filter((_,i)=>
 function pick(root,c,done){const head=el('p','score'),list=el('div','opts'),go=el('button','btn','Valider mes choix'),sel=new Set(),cap=c.budget||c.max;
   const used=()=>[...sel].reduce((a,i)=>a+(c.budget?c.opts[i].cost:1),0);
   const upd=()=>{head.textContent=c.budget?`${used()} point${used()>1?'s':''} engagé${used()>1?'s':''} sur ${cap}`:`${sel.size} choix sur ${cap}`;go.disabled=!sel.size};
-  c.opts.forEach((o,i)=>{const b=el('button','opt',`<span>${o.t}${c.budget?` <span class="cost">· ${o.cost} pt${o.cost>1?'s':''}</span>`:''}</span>`);b.type='button';b.setAttribute('aria-pressed','false');
+  c.opts.forEach((o,i)=>{if(c.groups&&o.g!==(c.opts[i-1]||{}).g)list.append(el('p','grp',c.groups[o.g]));const b=el('button','opt',`<span>${o.t}${c.budget?` <span class="cost">· ${o.cost} pt${o.cost>1?'s':''}</span>`:''}</span>`);b.type='button';b.setAttribute('aria-pressed','false');
     b.onclick=()=>{if(sel.has(i))sel.delete(i);else{if(used()+(c.budget?o.cost:1)>cap){head.textContent=c.budget?'Budget dépassé : retirez une action avant d\'en ajouter une.':`Vous avez déjà ${cap} choix : retirez-en un pour en changer.`;return}sel.add(i)}
       b.setAttribute('aria-pressed',sel.has(i));upd()};list.append(b)});
   go.type='button';go.onclick=()=>{$$('.opt',list).forEach((b,i)=>{const o=c.opts[i];b.disabled=true;b.classList.add(o.lvl);b.append(el('span','verdict',`<b>${o.tag}</b> ${o.why}`))});
