@@ -203,6 +203,11 @@ svg{display:block;width:100%;height:auto}
 .ergo-g small{color:var(--muted);font-size:.85rem}
 .ergo-g .ag{font-family:var(--mono);font-size:.72rem;color:var(--good);margin-top:auto;padding-top:4px}
 .ergo .src{font-size:.82rem;color:var(--muted);max-width:68ch}
+.ergo .cat{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.ergo .cat>p{max-width:68ch}
+.ergo .lk{display:flex;flex-wrap:wrap;gap:6px}
+.ergo .lk a{padding:6px 12px;border:1px solid var(--plan);border-radius:999px;font-size:.9rem;font-weight:600;text-decoration:none}
+.ergo .lk a:hover{border-color:var(--accent);color:var(--accent)}
 
 details.keep{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
 details.keep summary{cursor:pointer;padding:12px 14px;font-weight:700;font-family:var(--display)}
@@ -814,7 +819,7 @@ const ERGO=[
    return I.box(0,0,0,2,.12,1.3,FELT[2])+I.box(.2,.12,0,.1,.25,.05,METAL)+I.box(1.7,.12,0,.1,.25,.05,METAL)}]];
 function ergo(){
   const w=el('div','poste'),b=el('button','pc',`<svg class="iso" viewBox="0 0 64 64" aria-hidden="true">${chair(Iso(32,48,19),CH[0])}</svg><span><b>Matériel ergonomique</b><small>Voir les équipements qui réduisent les risques physiques</small></span>`),
-    m=el('div','ergo',`<ul class="ergo-g">${ERGO.map(([n,d,a,f])=>`<li><svg class="iso" viewBox="0 0 120 96" aria-hidden="true">${f()}</svg><b>${n}</b><small>${d}</small><span class="ag">Réduit : ${a}</span></li>`).join('')}</ul><p class="src">Dessins d'illustration, sans marque ni modèle. Le matériel ne protège que s'il est réglé à la personne, et il complète l'organisation du travail (pauses, alternance des tâches) sans la remplacer.</p>`);
+    m=el('div','ergo',`<ul class="ergo-g">${ERGO.map(([n,d,a,f])=>`<li><svg class="iso" viewBox="0 0 120 96" aria-hidden="true">${f()}</svg><b>${n}</b><small>${d}</small><span class="ag">Réduit : ${a}</span></li>`).join('')}</ul><div class="cat"><p><b>Voir du matériel réel.</b> Ouvrez un catalogue, choisissez un modèle par fiche et relevez ses réglages et son prix hors taxes : de quoi chiffrer votre plan d'actions pour un plateau de 50 postes.</p><p class="lk"><a href="https://www.manutan.fr/fr/maf/bureau-assis-debout-reglable" target="_blank" rel="noopener">Manutan · bureaux assis-debout</a><a href="https://www.manutan.fr" target="_blank" rel="noopener">Manutan · sièges et accessoires</a><a href="https://www.hp.com/fr-fr/poly/headsets/contact-center-headsets.html" target="_blank" rel="noopener">Poly (HP) · casques pour centres de contact</a><a href="https://www.jabra.com/fr-mea/business/contact-center-headsets" target="_blank" rel="noopener">Jabra · casques pour centres de contact</a><a href="https://www.inrs.fr/risques/travail-ecran.html" target="_blank" rel="noopener">INRS · régler un poste sur écran</a></p><p class="src">Sites de fournisseurs cités à titre d'exemple, sans recommandation ni partenariat ; l'INRS est l'organisme public de prévention. Les liens s'ouvrent dans un nouvel onglet.</p></div><p class="src">Dessins d'illustration, sans marque ni modèle. Le matériel ne protège que s'il est réglé à la personne, et il complète l'organisation du travail (pauses, alternance des tâches) sans la remplacer.</p>`);
   b.type='button';b.setAttribute('aria-expanded','false');m.hidden=true;
   b.onclick=()=>{m.hidden=!m.hidden;b.setAttribute('aria-expanded',!m.hidden)};
   w.append(b,m);return w}
