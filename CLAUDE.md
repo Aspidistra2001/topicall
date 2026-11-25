@@ -19,7 +19,7 @@ Copie sur le site : https://argospanoptes.fr/topicall-725e97d0/ (non répertori�
 
 1. **Style** : jetons de couleur sur `:root`, repris pour le thème sombre (`prefers-color-scheme` et `data-theme`). Polices Bricolage Grotesque, Figtree, IBM Plex Mono.
 2. **Introduction** (`.intro`) : repères sur le secteur des centres d'appels et liens vers deux vidéos (INA, YouTube).
-3. **Données** (`SITES`) : cinq sites, chacun avec ses salles. Une salle porte un `script` (répliques `[qui, texte]`, `''` pour une didascalie), une activité `act` et le corrigé `keep` en HTML.
+3. **Données** (`SITES`) : cinq sites, chacun avec ses salles. Une salle porte un `script` (répliques `[qui, texte]`, `''` pour une didascalie), une activité `act` et, facultatif, un rappel de cours `keep` en HTML (chaîne vide : aucun bloc). Les corrigés rédigés ont été retirés à la demande de l'enseignant : `keep` ne doit contenir que du cours, jamais la réponse au cas.
 4. **Moteur isométrique** (`Iso`, `tower`, `FURN`, `drawPlan`) : immeubles de la carte et vues d'étage. Les `box` des salles sont en pixels d'un plan 360 x 300, divisés par 19 pour obtenir les unités du monde.
 5. **Activités** : `classify` (classement ou vrai/faux), `plateau` (postes façon console de supervision), `pick` (choix sous budget ou en nombre limité), `spot` (passages fautifs à repérer).
 6. **Poste de travail** (`CALL`, `poste`) : dans les quatre salles de plateau (`kind:'open'`), un bouton ouvre un écran où défile un modèle de plan d'appel sortant. Le défilement est automatique, sauf si le navigateur demande de réduire les animations.

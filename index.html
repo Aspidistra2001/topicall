@@ -284,7 +284,7 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
   <section class="view" id="v-carte">
     <p class="mono">Cas TopiCall · mise en situation · TD 1, 3, 4, 5 et 6</p>
     <h1>Vous venez d'être recruté·e aux ressources humaines de TopiCall.</h1>
-    <p class="lede">Quatre plateformes rachetées une à une, quatre directeurs attachés à leur autonomie, près de 200 salariés et aucune règle RH commune. Rendez-vous sur chaque site, entrez dans les salles, écoutez les équipes et prenez vos décisions. Le corrigé s'affiche après chaque scène.</p>
+    <p class="lede">Quatre plateformes rachetées une à une, quatre directeurs attachés à leur autonomie, près de 200 salariés et aucune règle RH commune. Rendez-vous sur chaque site, entrez dans les salles, écoutez les équipes et prenez vos décisions. Chaque réponse reçoit un retour, et un rappel de cours suit certaines scènes.</p>
     <ul class="facts">
       <li><b>4</b> plateformes d'environ 50 personnes</li>
       <li><b>1</b> chef d'équipe pour 10 téléconseillers</li>
@@ -337,7 +337,7 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
   </section>
 </main>
 
-<footer><div class="wrap">Cas TopiCall : Nathalie Dumouchel, 2024, Prix du Cas AGRH 2024. Les prénoms et les répliques sont inventés pour la mise en scène, à partir des annexes du cas. Les éléments de corrigé sont une proposition à valider par l'équipe pédagogique.</div></footer>
+<footer><div class="wrap">Cas TopiCall : Nathalie Dumouchel, 2024, Prix du Cas AGRH 2024. Les prénoms et les répliques sont inventés pour la mise en scène, à partir des annexes du cas. Les retours affichés après les réponses sont une proposition à valider par l'équipe pédagogique.</div></footer>
 
 <script>
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -360,8 +360,7 @@ const SITES=[
   act:{type:'classify',task:'Que répondez-vous à votre propre question ?',cats:[],items:[{t:'Votre première action',a:'b',
    cats:[['a','Rédiger tout de suite la plaquette pour Bordeaux'],['b','Faire l\'état des lieux des risques sur le terrain'],['c','Commander une formation à la gestion du stress']],
    why:'On ne valorise et on ne corrige que ce que l\'on a d\'abord observé. La plaquette viendra à la fin, et la formation au stress est une réponse choisie avant d\'avoir posé le diagnostic.'}]},
-  keep:`<p>La demande a deux faces : <b>protéger la santé</b> des téléconseillers et <b>valoriser</b> TopiCall comme employeur auprès de Bordeaux. La seconde n'est crédible que si la première est faite.</p>
-  <p>La démarche suit les questions du TD :</p><ol><li>diagnostic des facteurs de risques, physiques et psychosociaux ;</li><li>conséquences pour les salariés et pour l'entreprise ;</li><li>plan d'actions ;</li><li>points forts à communiquer.</li></ol>
+  keep:`<p>Une démarche sur les conditions de travail suit quatre temps : le diagnostic des facteurs de risques, l'analyse de leurs conséquences, le plan d'actions, puis la communication.</p>
   <p>Cadre légal : l'employeur doit protéger la santé physique et mentale des salariés (Code du travail, art. L. 4121-1), évaluer les risques et les consigner dans le document unique d'évaluation des risques professionnels (DUERP). Les représentants du personnel sont associés.</p>`},
  {id:'m2',name:'Plateau n°1',short:'Plateau n°1',kind:'open',box:[10,10,222,172],q:'Question 1 · le diagnostic des risques',
   script:[['','Vous traversez le plateau entre deux vagues d\'appels. Dix téléconseillers acceptent de vous dire un mot.']],
@@ -376,15 +375,10 @@ const SITES=[
    {who:'Yasmine',t:'Un seul appel agressif et mon heure est fichue, même si elle avait bien commencé.',a:'emo',why:'Charge émotionnelle : les managers notent que les téléconseillers en perdent le sens des proportions.'},
    {who:'Lucas',t:'J\'appelle des gens qui en ont assez d\'être démarchés. Parfois je me demande si je leur rends vraiment service.',a:'val',why:'Doute sur l\'utilité et la qualité de son travail : c\'est le conflit de valeurs.'},
    {who:'Élodie',t:'Le mois dernier, trois semaines sans campagne. On est en CDI, mais si les clients ne reviennent pas ?',a:'ins',why:'Activité fluctuante, dépendance aux commandes des clients. Le CDI et la formation en période creuse limitent ce risque.'}]},
-  keep:`<p><b>Risques physiques</b> : bruit du plateau et écoute au casque, posture assise prolongée, travail sur écran, sollicitation de la voix.</p>
-  <p><b>Risques psychosociaux</b>, selon les six familles du rapport Gollac :</p>
-  <ul><li><b>Intensité et temps de travail</b> : 25 appels par heure, objectifs de durée et de taux de réponse, appels lancés par le système, horaires alternés de 8 h à 20 h du lundi au samedi.</li>
-  <li><b>Exigences émotionnelles</b> : rejets répétés, agressivité, « sourire au téléphone ».</li>
-  <li><b>Autonomie</b> : script à suivre étape par étape, écoutes aléatoires.</li>
-  <li><b>Rapports sociaux</b> : contrôle vécu comme une surveillance ; à l'inverse, l'équipe et le chef d'équipe sont des soutiens.</li>
-  <li><b>Conflits de valeurs</b> : démarcher des prospects lassés, parler au nom de la banque cliente.</li>
-  <li><b>Insécurité</b> : carnet de commandes incertain, jusqu'à 30 % des effectifs sans campagne.</li></ul>
-  <p>À remarquer : le script, les écoutes, les objectifs et le système d'appels servent la qualité vendue aux clients <em>et</em> créent du risque. C'est le même outil vu de deux côtés.</p>`},
+  keep:`<p>On distingue deux grandes catégories de risques professionnels.</p>
+  <p><b>Les risques physiques</b> : bruit, postures, travail sur écran, efforts, ambiance thermique ou lumineuse.</p>
+  <p><b>Les risques psychosociaux</b>, que le rapport Gollac range en six familles :</p>
+  <ul><li>l'intensité du travail et le temps de travail ;</li><li>les exigences émotionnelles ;</li><li>le manque d'autonomie ;</li><li>la mauvaise qualité des rapports sociaux ;</li><li>les conflits de valeurs ;</li><li>l'insécurité de la situation de travail.</li></ul>`},
  {id:'m3',name:'Salle de pause',short:'Pause',kind:'break',box:[168,190,182,100],q:'Question 2 · les conséquences',
   script:[['Nadia, élue du personnel','Ce que vous avez entendu sur le plateau, on le retrouve dans les arrêts maladie.'],
    ['Nadia, élue du personnel','Et quand quelqu\'un de bien formé s\'en va, c\'est toute la formation payée par TopiCall qui part avec lui.'],
@@ -397,12 +391,7 @@ const SITES=[
    {t:'Départs de téléconseillers formés',a:'e',why:'Le modèle de TopiCall repose sur des salariés stables et compétents : le turnover détruit l\'investissement en formation.'},
    {t:'Qualité des appels en baisse, clients banque et assurance mécontents',a:'e',why:'Le téléconseiller porte l\'image de TopiCall et celle du client.'},
    {t:'Mise en cause de la responsabilité de l\'employeur',a:'e',why:'L\'obligation de sécurité pèse sur l\'employeur.'}]},
-  keep:`<div class="tw"><table><tr><th>Pour les salariés</th><th>Pour l'entreprise</th></tr>
-  <tr><td>Fatigue auditive, troubles de la voix</td><td>Absentéisme, recours à l'intérim</td></tr>
-  <tr><td>Troubles musculosquelettiques, fatigue visuelle</td><td>Turnover, coûts de recrutement, formation perdue</td></tr>
-  <tr><td>Stress, anxiété, troubles du sommeil, épuisement</td><td>Baisse de qualité, clients moins fidèles</td></tr>
-  <tr><td>Vie personnelle perturbée par les horaires</td><td>Climat social dégradé, risque juridique, image d'employeur</td></tr></table></div>
-  <p>La « boucle vertueuse » de TopiCall (CDI, formation, compétence, clients fidèles) tient à la santé de ses téléconseillers. De mauvaises conditions de travail la cassent à la racine.</p>`},
+  keep:``},
  {id:'m4',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[10,190,150,100],ergo:1,q:'Questions 3 et 5 · le plan d\'actions',
   script:[['Claire, DRH','Le groupe de travail est réuni : deux téléconseillers, une cheffe d\'équipe, une élue, le responsable Qualité.'],
    ['Claire, DRH','L\'entreprise tourne bien, mais tout ne passera pas. Vous avez 10 points de budget.'],
@@ -426,18 +415,10 @@ const SITES=[
     {g:'rel',t:'Baby-foot et corbeille de fruits en salle de pause',cost:1,lvl:'bad',tag:'Hors sujet.',why:'Ne répond à aucun des facteurs de risque relevés.'}],
     summary:s=>{const G={org:'l\'organisation du travail',mat:'l\'environnement matériel et technique',rel:'les relations de travail et le bien-être'},pt=k=>s.filter(o=>o.g===k).reduce((a,o)=>a+o.cost,0),miss=Object.keys(G).filter(k=>!pt(k)),soft=s.filter(o=>o.lvl!=='good').reduce((a,o)=>a+o.cost,0);
      return `<b>Organisation : ${pt('org')} · Matériel et technique : ${pt('mat')} · Relations et bien-être : ${pt('rel')}</b> (en points). `+(miss.length?`Votre plan laisse de côté ${miss.map(k=>G[k]).join(' et ')} : les risques relevés sur le plateau touchent pourtant les trois domaines.`:pt('org')<4?'Les trois domaines sont couverts, mais l\'organisation du travail pèse peu alors que la plupart des risques en viennent (cadence, horaires, script, écoutes).':'Les trois domaines sont couverts et l\'organisation du travail est au centre : c\'est la logique attendue.')+(soft>=4?' Une part importante du budget aide les salariés à supporter les risques plutôt qu\'à les réduire.':'')}},
-  keep:`<p>Un plan d'actions sur les conditions de travail couvre <b>trois domaines</b> :</p>
-  <div class="tw"><table><tr><th>Domaine</th><th>Risques visés</th><th>Actions</th></tr>
-  <tr><td><b>Organisation du travail</b></td><td>Cadence, objectifs, horaires, faible autonomie, contrôle, agressivité des prospects</td><td>Objectifs de qualité à côté des 25 appels par heure · horaires stabilisés et choisis quand c'est possible · scripts plus souples · écoutes encadrées · alternance des tâches · droit de couper un appel injurieux</td></tr>
-  <tr><td><b>Environnement matériel et technique</b></td><td>Bruit, posture assise, travail sur écran, cadence imposée par le système</td><td>Traitement acoustique et casques à limiteur · sièges et écrans réglables · délai entre deux appels · salle de pause au calme</td></tr>
-  <tr><td><b>Relations de travail et bien-être</b></td><td>Charge émotionnelle, isolement face aux refus, stress</td><td>Échanges en équipe sur les appels difficiles · formation des chefs d'équipe et des téléconseillers · cellule d'écoute en complément</td></tr></table></div>
-  <p>Dans chaque domaine, on commence par ce qui réduit le risque à la source ; les actions qui aident à le supporter ou qui prennent en charge les personnes atteintes viennent en complément.</p>
-  <p>Chaque action a un responsable, une échéance et un indicateur de suivi (absentéisme, turnover, résultats d'enquête).</p>
-  <p><b>Enseignements de l'exercice</b></p>
-  <ul><li>On diagnostique le travail réel, sur le terrain et avec ceux qui le font.</li>
-  <li>La GRH arbitre entre des logiques contradictoires : qualité et coûts d'un côté, santé de l'autre.</li>
-  <li>Les conditions de travail sont une obligation légale, un facteur de performance et un argument d'attractivité.</li>
-  <li>La démarche est partagée : direction, RH, managers, élus, salariés.</li></ul>`}]},
+  keep:`<p>Un plan d'actions sur les conditions de travail couvre <b>trois domaines</b> : l'organisation du travail, l'environnement matériel et technique, les relations de travail et le bien-être.</p>
+  <p>On distingue aussi trois niveaux de prévention :</p>
+  <ul><li><b>primaire</b> : supprimer ou réduire le risque à la source ;</li><li><b>secondaire</b> : aider les salariés à y faire face ;</li><li><b>tertiaire</b> : prendre en charge ceux qui sont atteints.</li></ul>
+  <p>Chaque action a un responsable, une échéance et un indicateur de suivi.</p>`}]},
 
 {id:'lille',city:'Lille',x:218,y:25,floors:4,hi:1,origin:'À l\'origine : vente de produits et services de téléphonie',
  ep:'Épisode 2 · TD 4',theme:'Le recrutement',
@@ -459,7 +440,7 @@ const SITES=[
     'Informations essentielles absentes : type de contrat, rémunération, horaires réels.']},
   keep:`<p>Une offre d'emploi est un acte juridique et un acte de communication.</p>
   <ul><li><b>Juridique</b> : aucun critère discriminatoire (sexe, âge, origine, situation de famille… Code du travail, art. L. 1132-1), pas de limite d'âge, pas d'allégation fausse, rédaction en français.</li>
-  <li><b>Communication</b> : elle porte l'image de qualité que TopiCall veut consolider. Elle présente l'entreprise, la mission, le profil, les conditions (contrat, horaires, lieu, rémunération) et la manière de candidater.</li></ul>`},
+  <li><b>Communication</b> : elle porte l'image de l'employeur. Elle présente l'entreprise, la mission, le profil, les conditions (contrat, horaires, lieu, rémunération) et la manière de candidater.</li></ul>`},
  {id:'l2',name:'Plateau',short:'Plateau',kind:'open',box:[128,10,222,172],q:'Questions 1 et 2 · la fiche de poste',
   script:[['','Vous vous asseyez à côté de Sarah, téléconseillère, en double écoute.'],
    ['Sarah','Bonjour Madame, Sarah à l\'appareil, je vous appelle de la part de votre banque.'],
@@ -477,9 +458,8 @@ const SITES=[
    {t:'Dépanner l\'applicatif de relation client',lvl:'bad',tag:'Non.',why:'Activité du chargé de maintenance.'},
    {t:'Se former aux produits de chaque nouvelle campagne et remonter les difficultés rencontrées',lvl:'good',tag:'Oui.',why:'L\'adaptabilité est une exigence explicite du poste.'}],
    summary:s=>{const g=s.filter(o=>o.lvl==='good').length;return `<b>${g} activité${g>1?'s':''} sur 5</b> relève${g>1?'nt':''} bien du téléconseiller. Une fiche de poste décrit un poste précis dans une organisation précise : elle le distingue de ceux du chef d'équipe, du commercial ou du chargé de formation.`}},
-  keep:`<p><b>Fiches du Répertoire opérationnel des métiers et des emplois (ROME)</b> : pour le téléconseiller, <b>D1408 Téléconseil et télévente</b> ; pour le commercial, <b>D1402 Relation commerciale grands comptes et entreprises</b>. Le ROME a été refondu : vérifiez les codes sur le site de France Travail.</p>
-  <p class="card"><b>Intitulé</b> : Téléconseiller·ère banque et assurance<br><b>Rattachement</b> : chef·fe d'équipe<br><b>Mission</b> : réaliser, pour le compte des clients banque et assurance, des campagnes d'appels sortants à valeur ajoutée, en portant l'image de qualité de TopiCall et celle du client.<br><b>Activités</b> : appeler les clients et prospects · présenter l'offre et argumenter · écouter et traiter les objections · prendre rendez-vous ou conclure, et renseigner le dossier · se former à chaque campagne et remonter les difficultés.<br><b>Spécificités</b> : horaires variables entre 8 h et 20 h du lundi au samedi · travail au casque et sur écran · objectifs quantitatifs et qualitatifs · appels écoutés.</p>
-  <p class="card"><b>Intitulé</b> : Commercial·e clients banque et assurance<br><b>Rattachement</b> : directeur·rice de plateforme<br><b>Mission</b> : vendre les prestations de TopiCall aux acheteurs des banques et assureurs et maintenir sa place sur un marché très concurrentiel.<br><b>Activités</b> : prospecter et fidéliser · analyser le besoin · négocier prix et délais · négocier en interne le temps de montée en compétences · suivre les campagnes vendues.<br><b>Spécificités</b> : déplacements fréquents, permis de conduire.</p>`},
+  keep:`<p>Une <b>fiche de poste</b> décrit un poste précis dans une organisation précise : intitulé, rattachement hiérarchique, mission, activités principales, spécificités.</p>
+  <p>Le <b>Répertoire opérationnel des métiers et des emplois (ROME)</b> de France Travail décrit des métiers types. Il sert de point de départ, que l'on adapte ensuite à l'entreprise.</p>`},
  {id:'l3',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[200,190,150,100],q:'Questions 3 et 4 · le profil et l\'offre',
   script:[['Philippe, directeur','Moi, je veux des jeunes. Ils sont plus souples sur les horaires.'],
    ['Claire, DRH','On définit un profil à partir du poste, pas à partir d\'une idée que l\'on se fait du candidat.'],
@@ -493,11 +473,8 @@ const SITES=[
    {t:'Sans enfant en bas âge',a:'n',why:'Discrimination liée à la situation de famille. C\'est au candidat de juger si les horaires lui conviennent.'},
    {t:'Première expérience de la relation client appréciée, débutants acceptés',a:'o',why:'Cohérent avec une entreprise qui forme beaucoup.'},
    {t:'Photo exigée, bonne présentation',a:'n',why:'Apparence physique : critère discriminatoire, et sans objet pour un poste au téléphone.'}]},
-  keep:`<p><b>Profil de recrutement</b></p>
-  <ul><li><b>Diplôme</b> : Bac à Bac+2, commerce, relation client, banque ou assurance ; ou expérience équivalente.</li>
-  <li><b>Expérience</b> : une première expérience de la relation client est un plus ; débutants acceptés car TopiCall forme.</li>
-  <li><b>Qualités</b> : aisance orale, écoute, persévérance face au refus, adaptabilité, rigueur, goût du travail en équipe.</li></ul>
-  <p class="card"><b>Conseiller·ère clientèle à distance, banque et assurance (F/H) · CDI · Lille</b><br>TopiCall réunit quatre plateformes et près de 200 salariés. Nous réalisons pour de grandes banques et compagnies d'assurance des campagnes d'appels à valeur ajoutée. Notre choix : des contrats durables et trois fois plus de formation que l'obligation légale.<br><b>Votre mission</b> : vous contactez les clients de nos partenaires, écoutez leur situation et leur proposez le service ou le rendez-vous qui leur convient. Chaque campagne vous fait découvrir de nouveaux produits.<br><b>Votre profil</b> : vous aimez convaincre et écouter, vous vous exprimez avec aisance. Bac à Bac+2 ou expérience de la relation client ; débutants bienvenus.<br><b>Conditions</b> : CDI, formation à l'arrivée et à chaque campagne, équipe de dix avec un·e chef·fe d'équipe, horaires par roulement entre 8 h et 20 h du lundi au samedi, rémunération à préciser.<br><b>Pour candidater</b> : contact et date limite.</p>`},
+  keep:`<p>Le <b>profil de recrutement</b> se déduit de la fiche de poste : niveau et type de diplôme, expérience, qualités attendues. Chaque critère doit pouvoir se justifier par une exigence du poste.</p>
+  <p>Les critères discriminatoires sont interdits : sexe, âge, origine, situation de famille, apparence physique, entre autres (Code du travail, art. L. 1132-1).</p>`},
  {id:'l4',name:'Salle de formation',short:'Formation',kind:'train',box:[10,190,182,100],q:'Question 5 · détecter les potentiels',
   script:[['','Session collective : six candidats, convoqués sans tri sur le diplôme.'],
    ['Vous','Vous avez dix minutes pour lire cette fiche produit. Ensuite vous m\'appelez : je suis un artisan pressé.'],
@@ -514,7 +491,6 @@ const SITES=[
    {t:'Exercice en groupe : s\'accorder sur la réponse à un client mécontent',lvl:'good',tag:'Pertinent.',why:'Fait apparaître l\'esprit d\'équipe et la manière de gérer un désaccord.'}],
    summary:s=>{const g=s.filter(o=>o.lvl==='good').length;return `<b>${g} exercice${g>1?'s':''} sur ${s.length}</b> ${g>1?'sont pertinents':'est pertinent'}. Le bon exercice fait faire au candidat un échantillon du travail réel, observé avec une grille identique pour tous.`}},
   keep:`<p>Détecter un potentiel, c'est observer des aptitudes en situation plutôt que lire un CV : c'est le principe du recrutement par simulation.</p>
-  <ul><li>Simulation d'appel avec objections.</li><li>Appropriation rapide d'un produit inconnu.</li><li>Écoute, reformulation et saisie simultanée.</li><li>Exercice collectif.</li></ul>
   <p>Trois règles : les méthodes sont <b>pertinentes</b> au regard du poste, le candidat en est <b>informé</b> à l'avance, et les informations demandées ont un <b>lien direct</b> avec l'emploi (Code du travail, art. L. 1221-6 et L. 1221-8).</p>`}]},
 
 {id:'lyon',city:'Lyon',x:266,y:234,floors:6,hi:3,origin:'À l\'origine : rendez-vous pour des agents immobiliers',
@@ -532,8 +508,7 @@ const SITES=[
    {t:'Une échelle en quatre points oblige à prendre parti.',a:'v',why:'Sans position neutre, chacun penche d\'un côté. Additionner « plutôt » et « tout à fait d\'accord » efface ensuite les nuances.'},
    {t:'« La qualité de vie au travail est supérieure à celle des autres call centers » mesure la satisfaction au travail.',a:'f',why:'C\'est une comparaison avec un secteur réputé difficile, que beaucoup ne connaissent que par ouï-dire. On peut être mieux qu\'ailleurs sans être bien.'},
    {t:'Un résultat global peut cacher de forts écarts entre sites.',a:'v',why:'Un verbatim le dit : « Tous les sites ne sont pas traités à la même enseigne. » Il faut lire les résultats par site.'}]},
-  keep:`<p>Points solides : 30 minutes libérées sur le temps de travail, anonymat garanti par le papier et l'urne, zone d'expression libre, répondants représentatifs.</p>
-  <p>Limites : 44 % de silencieux, questions fermées et parfois orientées, résultats agrégés, déclaratif à un instant donné.</p>
+  keep:`<p>Une enquête interne se juge sur sa méthode avant ses résultats : le taux de réponse et ce que l'on sait des non-répondants, l'anonymat, la formulation des questions, l'échelle de réponse, le niveau auquel les résultats sont lus.</p>
   <p>Une enquête crée une attente. Sans restitution ni suites, elle démotive.</p>`},
  {id:'y2',name:'Bureau RH',short:'Bureau RH',kind:'office',box:[240,10,110,82],q:'Question 1 · lire les résultats',
   script:[['Hugo, stagiaire','Voilà la part de « plutôt d\'accord » et « tout à fait d\'accord » pour chaque affirmation.'],
@@ -548,10 +523,7 @@ const SITES=[
    {t:bar('L\'autonomie et les marges de manœuvre sont suffisantes',38),a:'a',why:'Cohérent avec le poids du script et des écoutes.'},
    {t:bar('Le management est juste et équitable au sein de TopiCall',44),a:['a','m'],why:'Moins d\'un sur deux. On apprécie son manager (69 %) mais on doute de l\'équité de l\'entreprise.'},
    {t:bar('Les opportunités de développement et d\'évolution sont satisfaisantes',41),a:'a',why:'Peu de perspectives sans changer de région.'}]},
-  keep:`<p><b>Image générale</b> : on est plutôt bien chez TopiCall, sans y être vraiment mobilisé. L'environnement de travail satisfait, le travail lui-même et sa reconnaissance beaucoup moins.</p>
-  <ul><li><b>Points forts</b> : collaboration (79 %), soutien du manager (69 %), qualité de vie comparée (67 %).</li>
-  <li><b>Mitigé</b> : intérêt du travail (55 %).</li>
-  <li><b>Axes d'amélioration</b> : reconnaissance (32 %), autonomie (38 %), objectifs (39 %), évolution (41 %), équité (44 %).</li></ul>`},
+  keep:``},
  {id:'y3',name:'Plateau',short:'Plateau',kind:'open',box:[10,10,222,172],q:'Question 2 · les théories de la motivation',
   script:[['','Sept téléconseillers ont rempli la zone d\'expression libre. Vous allez les voir un par un.']],
   act:{type:'plateau',task:'À quelle famille de facteurs se rattache chaque verbatim ?',cats:[['b','Besoins de l\'individu'],['t','Le travail lui-même'],['m','Système de management']],items:[
@@ -562,20 +534,8 @@ const SITES=[
    {who:'Poste 5',t:'À quoi ça sert de nous coller des objectifs qu\'on ne pourra pas atteindre ? Au final, on a l\'impression d\'être nuls.',a:'m',why:'Un objectif hors d\'atteinte ne récompense jamais l\'effort (théories béhavioristes). Il contrarie aussi le besoin d\'accomplissement (McClelland) : « l\'impression d\'être nuls ».'},
    {who:'Poste 6',t:'L\'équipe est top, c\'est pour les voir que je me lève le matin.',a:'b',why:'Besoin d\'appartenance chez Maslow, de sociabilité chez Alderfer, d\'affiliation chez McClelland.'},
    {who:'Poste 7',t:'Ce qui manque surtout, c\'est un peu d\'espoir de faire autre chose sans avoir à déménager à l\'autre bout de la France.',a:['b','m'],why:'Besoin d\'accomplissement et de progression. La réponse relève du management : la gestion des carrières.'}]},
-  keep:`<p><b>Le classement des résultats de l'enquête</b> : <span class="btm btm-B">B</span>besoins des individus · <span class="btm btm-T">T</span>le travail lui-même · <span class="btm btm-M">M</span>système de management.</p>
-  <p class="mono">Les neuf affirmations du questionnaire</p>
-  <ul class="btml"><li><span class="btm btm-M">M</span>La qualité de vie au travail chez TopiCall est supérieure à celle des autres call centers · <b>67 %</b></li><li><span class="btm btm-T">T</span>Le travail est intéressant et stimulant · <b>55 %</b></li><li><span class="btm btm-B">B</span>Les opportunités de développement et d'évolution sont satisfaisantes · <b>41 %</b></li><li><span class="btm btm-M">M</span>Le management est juste et équitable au sein de TopiCall · <b>44 %</b></li><li><span class="btm btm-T">T</span>L'autonomie et les marges de manœuvre sont suffisantes pour faire le travail · <b>38 %</b></li><li><span class="btm btm-B">B</span>La collaboration dans l'équipe se passe bien · <b>79 %</b></li><li><span class="btm btm-T">T</span>Les objectifs fixés permettent un travail de qualité · <b>39 %</b></li><li><span class="btm btm-B">B</span>La reconnaissance de l'entreprise est à la mesure des efforts fournis · <b>32 %</b></li><li><span class="btm btm-M">M</span>Le manager direct apporte un soutien au quotidien · <b>69 %</b></li></ul>
-  <p class="mono">Les sept verbatims</p>
-  <ul class="btml"><li><span class="btm btm-M">M</span>« Tous les sites ne sont pas traités à la même enseigne… »</li><li><span class="btm btm-T">T</span>« Beau métier si on aime la relation client ! Mais des fois, c'est dur d'avoir beaucoup de “Non”… »</li><li><span class="btm btm-M">M</span>« Mon manager fait ce qu'il peut pour nous encourager, mais il n'a pas de marges de manœuvre. Qu'on bosse bien ou pas, ça ne fait pas de différence sur la fiche de paye. »</li><li><span class="btm btm-B">B</span>« Franchement, on est bien à TopiCall… »</li><li><span class="btm btm-M">M</span>« À quoi ça sert de nous coller des objectifs qu'on ne pourra pas atteindre ?… »</li><li><span class="btm btm-B">B</span>« L'équipe est top, c'est pour les voir que je me lève le matin. »</li><li><span class="btm btm-B">B</span>« Ce qui manque surtout, c'est un peu d'espoir de faire autre chose sans avoir à déménager… »</li></ul>
-  <p>Deux classements se discutent : la <b>reconnaissance</b> et les <b>opportunités d'évolution</b> répondent à des besoins (estime, accomplissement), mais elles dépendent de décisions de management (rémunération, gestion des carrières). Un classement en M est recevable s'il est justifié.</p>
-  <div class="tw"><table><tr><th>Famille</th><th>Théories</th><th>Chez TopiCall</th></tr>
-  <tr><td>Besoins de l'individu</td><td>Maslow, Alderfer, McClelland</td><td>Appartenance et sécurité satisfaites ; estime et accomplissement en manque (reconnaissance 32 %, évolution 41 %)</td></tr>
-  <tr><td>Le travail lui-même</td><td>Herzberg, Hackman et Oldham ; motivation intrinsèque (Ryan et al.)</td><td>Travail intéressant pour 55 % ; autonomie faible (38 %) ; objectifs qui permettent mal un travail de qualité (39 %) ; retours surtout négatifs des prospects</td></tr>
-  <tr><td>Système de management</td><td>Théories béhavioristes, Adams</td><td>Qualité de vie au travail jugée meilleure qu'ailleurs (67 %) et soutien du manager (69 %) ; mais objectifs dits inatteignables dans les verbatims, pas de lien effort-récompense, doute sur l'équité (44 %)</td></tr></table></div>
-  <p>Le détail de chaque théorie se trouve sur le plateau, sous le bouton « Théories de la motivation ».</p>
-  <p>Lecture avec Herzberg : TopiCall a soigné les <b>facteurs d'hygiène</b> (conditions, relations, encadrement), ce qui évite l'insatisfaction. Les <b>facteurs moteurs</b> (reconnaissance, responsabilité, évolution, intérêt du travail) restent faibles, et ce sont eux qui motivent.</p>
-  <p>La <b>motivation intrinsèque</b> se travaille directement sur le plateau : ouvrez le bouton « Motivation intrinsèque », au-dessus des postes.</p>
-  <p>Certains verbatims se rattachent à deux familles : l'important est de justifier le classement.</p>`},
+  keep:`<p>Les théories de la motivation se rangent en trois familles : celles centrées sur les <b>besoins</b> des individus, celles centrées sur le <b>travail</b>, celles centrées sur le <b>système de management</b>.</p>
+  <p>Le détail se trouve sur le plateau, au-dessus des postes : boutons « Théories de la motivation » et « Motivation intrinsèque ».</p>`},
  {id:'y4',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[108,190,130,100],q:'Questions 3 et 4 · vos propositions',
   script:[['Bruno, dirigeant','Vous m\'avez convaincu. Mais je ne peux pas tout faire cette année.'],
    ['Claire, DRH','Trois actions. Celles qui répondent à ce que les salariés ont écrit.']],
@@ -589,10 +549,7 @@ const SITES=[
    {t:'Répartir les campagnes entre les sites selon des règles connues de tous',lvl:'good',tag:'Pertinent.',why:'Répond au sentiment d\'iniquité entre sites.'},
    {t:'Donner des marges de manœuvre aux chefs d\'équipe et de la souplesse sur les scripts',lvl:'good',tag:'Pertinent.',why:'Le soutien du manager existe, ses moyens d\'agir non. Répond aussi à l\'autonomie (38 %).'}],
    summary:s=>{const g=s.filter(o=>o.lvl==='good').length,r=s.some(o=>o.tag==='Indispensable.');return `<b>${g} action${g>1?'s':''} sur ${s.length}</b> ${g>1?'répondent':'répond'} aux attentes exprimées. `+(r?'Vous avez pensé à la restitution : c\'est le point de départ de tout le reste.':'Il manque la restitution des résultats aux équipes : sans elle, les salariés concluront que leur parole n\'a servi à rien.')}},
-  keep:`<p>Les actions partent des résultats, et s'appuient sur les points forts (le collectif, les chefs d'équipe) pour traiter les points faibles.</p>
-  <ul><li>Restituer et associer les salariés au choix des actions.</li><li>Objectifs atteignables, mêlant quantité et qualité.</li><li>Reconnaissance, monétaire et non monétaire, liée à la contribution.</li><li>Parcours d'évolution et passerelles entre métiers.</li><li>Équité entre sites dans la répartition des campagnes.</li><li>Autonomie des téléconseillers et marges de manœuvre des managers.</li></ul>
-  <p><b>Enseignements de l'exercice</b></p>
-  <ul><li>Satisfaction et motivation sont deux choses distinctes.</li><li>Aucune théorie ne suffit seule : chacune éclaire une partie des résultats.</li><li>Une enquête engage : il faut restituer, agir, puis mesurer à nouveau.</li><li>La motivation dépend de la cohérence de toutes les pratiques RH : objectifs, rémunération, carrières, management.</li></ul>`}]},
+  keep:``}]},
 
 {id:'marseille',city:'Marseille',x:280,y:338,lx:1,floors:3,hi:1,origin:'À l\'origine : promotion de l\'investissement immobilier défiscalisé',
  ep:'Épisode 4 · TD 6',theme:'L\'évaluation des salariés',
@@ -611,11 +568,8 @@ const SITES=[
    {t:'Fidéliser les téléconseillers',a:'o',why:'Un objectif qui s\'adresse plutôt à un chef d\'équipe ou à un directeur.'},
    {t:'Taux de turnover annuel',a:'i',why:'L\'indicateur classique de la fidélisation.'},
    {t:'Moins de 10 % sur l\'année',a:'c',why:'La valeur à atteindre sur l\'indicateur.'}]},
-  keep:`<div class="tw"><table><tr><th>Pour qui</th><th>Objectif</th><th>Indicateur</th><th>Valeur cible</th></tr>
-  <tr><td>Téléconseiller</td><td>Assurer la qualité des échanges</td><td>Part des appels écoutés conformes à la grille</td><td>90 % sur le trimestre</td></tr>
-  <tr><td>Téléconseiller</td><td>Obtenir des rendez-vous utiles au client</td><td>Part des rendez-vous pris qui sont honorés</td><td>80 % sur la campagne</td></tr>
-  <tr><td>Chef d'équipe</td><td>Préparer l'équipe à chaque campagne</td><td>Part des téléconseillers formés avant le lancement</td><td>100 %</td></tr></table></div>
-  <p>Les valeurs sont données à titre d'exemple. Un bon objectif est précis, mesurable, atteignable, lié au poste et daté ; le salarié dispose des moyens de l'atteindre et il a été discuté avec lui.</p>`},
+  keep:`<p>Un <b>objectif</b> dit où l'on veut aller. Un <b>indicateur</b> dit comment on le mesure. Une <b>valeur cible</b> dit quel niveau on attend, et pour quand.</p>
+  <p>Un bon objectif est précis, mesurable, atteignable, lié au poste et daté ; le salarié dispose des moyens de l'atteindre et il a été discuté avec lui.</p>`},
  {id:'s2',name:'Plateau',short:'Plateau',kind:'open',box:[128,10,222,172],q:'Séquence 1 · les effets des objectifs sur le travail',
   script:[['','Trois mois plus tard, vous revenez voir comment les objectifs ont changé le travail.']],
   act:{type:'plateau',task:'Effet recherché ou effet pervers ?',cats:[['r','Effet recherché'],['p','Effet pervers']],items:[
@@ -625,9 +579,7 @@ const SITES=[
    {who:'Aïcha',t:'On a un objectif d\'équipe sur la qualité : les anciens aident les nouveaux.',a:'r',why:'Un objectif collectif soutient la coopération.'},
    {who:'Rémy',t:'Pour avoir une bonne écoute, je récite le script mot à mot.',a:'p',why:'La conformité devient le but, au détriment de la relation avec le client.'},
    {who:'Lina',t:'Mon voisin a les meilleurs fichiers. Je ne lui passe plus mes astuces.',a:'p',why:'Des objectifs purement individuels mettent en concurrence et abîment le collectif.'}]},
-  keep:`<p><b>Effets recherchés</b> : clarté des attentes, effort orienté, retour sur son travail, base de discussion pour l'entretien, reconnaissance possible.</p>
-  <p><b>Effets pervers</b> : priorité à ce qui est mesuré, quantité contre qualité, indicateurs arrangés, stress, perte d'autonomie, concurrence entre collègues, démotivation si la cible est hors d'atteinte.</p>
-  <p><b>Précautions</b> : peu d'objectifs, équilibrés entre quantité et qualité, individuels et collectifs, discutés avec les intéressés et revus si le contexte change.</p>`},
+  keep:`<p>Précautions pour fixer des objectifs : en retenir peu, les équilibrer entre quantité et qualité, combiner objectifs individuels et collectifs, les discuter avec les intéressés et les revoir si le contexte change.</p>`},
  {id:'s3',name:'Salle de réunion',short:'Réunion',kind:'meeting',box:[128,190,222,100],q:'Séquence 2 · l\'arrêt de la Cour de cassation',
   script:[['Stéphane, directeur','J\'ai lu qu\'un grand groupe classe ses salariés chaque année : 20 % de très bons, 5 % d\'insuffisants. On fait pareil ?'],
    ['Claire, DRH','Lisons d\'abord l\'arrêt Hewlett-Packard France : Cour de cassation, chambre sociale, 27 mars 2013.'],
@@ -639,12 +591,8 @@ const SITES=[
    {t:'Les salariés doivent être informés des méthodes d\'évaluation avant leur mise en œuvre.',a:'v',why:'Code du travail, art. L. 1222-3.'},
    {t:'L\'évaluation peut porter sur des éléments sans lien avec les aptitudes professionnelles.',a:'f',why:'Les informations demandées doivent avoir un lien direct et nécessaire avec l\'évaluation des aptitudes (art. L. 1222-2).'},
    {t:'Les représentants du personnel doivent être consultés avant la mise en place d\'un dispositif d\'évaluation.',a:'v',why:'C\'était le comité d\'entreprise et le CHSCT en 2013 ; c\'est aujourd\'hui le comité social et économique.'}]},
-  keep:`<p><b>1. Le dispositif</b> : le « ranking » par quotas, ou classement forcé. Les salariés sont répartis en groupes de notes (K, P, I) selon des pourcentages fixés à l'avance.</p>
-  <p><b>2. Les conditions de validité d'une évaluation</b></p>
-  <ul><li>des critères objectifs, transparents et pertinents au regard de la finalité ;</li><li>un lien direct et nécessaire avec les aptitudes professionnelles ;</li><li>une information préalable des salariés ;</li><li>une consultation préalable des représentants du personnel ;</li><li>des résultats confidentiels ;</li><li>un dispositif qui ne compromet pas la santé des salariés.</li></ul>
-  <p><b>3. Les problèmes soulevés</b> : des quotas, même indicatifs, introduisent un critère étranger aux aptitudes ; les salariés n'auraient pas été informés individuellement ; la mise en concurrence est source de stress ; les instances n'auraient pas été consultées.</p>
-  <p><b>La solution</b> : la Cour pose le principe (le classement par quotas imposés est illicite) mais rejette le pourvoi, car ce classement n'était pas appliqué en fait chez Hewlett-Packard France.</p>
-  <p><b>Pour TopiCall</b> : la proposition de Stéphane est à écarter. Les écoutes et les objectifs des téléconseillers doivent répondre aux mêmes exigences.</p>`}]},
+  keep:`<p>Les conditions de validité d'un dispositif d'évaluation des salariés :</p>
+  <ul><li>des critères objectifs, transparents et pertinents au regard de la finalité ;</li><li>un lien direct et nécessaire avec les aptitudes professionnelles (Code du travail, art. L. 1222-2) ;</li><li>une information préalable des salariés (art. L. 1222-3) ;</li><li>une consultation préalable des représentants du personnel ;</li><li>des résultats confidentiels ;</li><li>un dispositif qui ne compromet pas la santé des salariés.</li></ul>`}]},
 
 {id:'bordeaux',city:'Bordeaux',x:119,y:273,floors:4,hi:2,proj:1,origin:'Plateforme en cours de rachat',
  ep:'Épilogue · TD 3, question 4',theme:'Convaincre la nouvelle plateforme',
@@ -664,9 +612,7 @@ const SITES=[
    {t:'Un chef d\'équipe pour dix téléconseillers',a:'o',why:'Un encadrement de proximité, que les salariés disent apprécier.'},
    {t:'Les horaires alternés conviennent très bien aux jeunes mamans',a:'n',why:'Plusieurs intéressées disent le contraire, et l\'argument repose sur un stéréotype. On valorise plutôt les aménagements obtenus.'},
    {t:'Un état des lieux des risques a été mené avec les élus, suivi d\'un plan d\'actions',a:'o',why:'La démarche elle-même est votre meilleur argument : elle montre comment TopiCall traite ses problèmes.'}]},
-  keep:`<p><b>À valoriser</b> : la stabilité de l'emploi, l'investissement en formation, les règles de pause et de durée, l'encadrement de proximité, la force des équipes, et la démarche d'amélioration engagée avec les représentants du personnel.</p>
-  <p><b>Règle de communication</b> : ne promettre que ce qui existe. Les équipes de Bordeaux compareront vite le discours et la réalité, et les contraintes du métier (cadence, horaires, écoutes) se disent mieux d'emblée.</p>
-  <p><b>Votre parcours</b> : en quatre épisodes, vous avez traité les conditions de travail, le recrutement, la motivation et l'évaluation. Ces pratiques se tiennent : des objectifs mal posés dégradent la santé, la motivation et la qualité du recrutement suivant. C'est ce qui fait de la GRH une fonction partagée entre la direction, les RH, les managers et les élus.</p>`}]}
+  keep:``}]}
 ];
 const ALL=SITES.flatMap(s=>s.rooms.map(r=>r.id));
 
@@ -1025,13 +971,13 @@ function openRoom(t,r,scroll){
   $$('[data-room]').forEach(n=>n.classList.toggle('on',n.dataset.room===r.id));
   sc.append(el('p','mono',`${t.city} · ${r.q}`),el('h3',null,r.name));
   const box=el('div','script'),ctl=el('div','row'),next=el('button','btn','Suite'),skip=el('button','btn ghost','Tout afficher');next.type=skip.type='button';
-  const act=el('div','act'),keep=el('details','keep',`<summary>Le corrigé de cette scène</summary><div class="in">${r.keep}</div>`),nav=el('div','row');
+  const act=el('div','act'),keep=r.keep?el('details','keep',`<summary>Rappel de cours</summary><div class="in">${r.keep}</div>`):'',nav=el('div','row');
   let i=0;
   const line=()=>{const[w,x]=r.script[i++];box.append(w?el('p','ln'+(w.startsWith('Vous')?' me':''),`<b>${w}</b><span>${x}</span>`):el('p','ln dir',x));if(i>=r.script.length)play()};
   const play=()=>{ctl.remove();act.hidden=false};
   next.onclick=line;skip.onclick=()=>{while(i<r.script.length)line()};
   ctl.append(next,skip);
-  const finish=()=>{mark(r.id);keep.open=true;
+  const finish=()=>{mark(r.id);if(keep)keep.open=true;
     const k=t.rooms.indexOf(r),nx=t.rooms[k+1];
     if(nx){const b=el('button','btn',`Salle suivante : ${nx.name}`);b.type='button';b.onclick=()=>openRoom(t,nx,true);nav.append(b)}
     else{const ns=SITES[SITES.indexOf(t)+1];const a=el('a','btn',ns?`Site suivant : ${ns.city}`:'Retour à la carte');a.href='#'+(ns?ns.id:'carte');a.style.textDecoration='none';nav.append(a)}};
