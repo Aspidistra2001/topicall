@@ -1004,7 +1004,7 @@ function refresh(){
 /* ---- jeu d'ouverture du TD 5 : les enchères de la motivation ----
    Vue étudiant (#encheres) : 100 points à répartir, puis un code à coller dans le chat de la visio.
    Vue animateur (#encheres-salle) : on colle le chat, la page additionne les mises. Rien n'est envoyé ni stocké. */
-const MISES=[['De bonnes conditions d\'études : locaux, emploi du temps, organisation','M',67],['Des cours et des travaux intéressants en eux-mêmes','T',55],['Le diplôme et le métier que je vise','B',41],['Une notation juste et équitable','M',44],['La liberté d\'organiser mon travail comme je l\'entends','T',38],['L\'ambiance et l\'entraide entre étudiants','B',79],['Des consignes et des attendus clairs, qui permettent de bien travailler','T',39],['La reconnaissance de mes efforts, par les enseignants ou mes proches','B',32],['Des enseignants disponibles, qui me soutiennent','M',69],['Les notes, la validation de l\'année, la peur d\'échouer','M',null]];
+const MISES=[['De bonnes conditions d\'études : locaux, emploi du temps, organisation','M',67],['Des cours et des travaux intéressants en eux-mêmes','T',55],['Le diplôme et le métier que je vise','B',41],['Une notation juste et équitable','M',44],['La liberté d\'organiser mon travail comme je l\'entends','T',38],['L\'ambiance et l\'entraide entre étudiants','B',79],['Des consignes et des attendus clairs, qui permettent de bien travailler','T',39],['La reconnaissance de mes efforts, par les enseignants ou mes proches','B',32],['Des enseignants disponibles, qui me soutiennent','M',69],['Les notes, la validation de l\'année, la peur d\'échouer','M',null],['La possibilité de suivre une partie des cours à distance','M',null]];
 const FAM={B:'besoins des individus',T:'le travail lui-même',M:'système de management'};
 function barres(vals,o={}){const mx=Math.max(1,...vals),ord=vals.map((v,i)=>i).sort((a,b)=>vals[b]-vals[a]);
   return `<ol class="mz">${ord.map(i=>`<li>${o.fam?`<span class="btm btm-${MISES[i][1]}">${MISES[i][1]}</span>`:''}<span class="mz-l">${MISES[i][0]}</span><span class="mz-b"><i style="width:${Math.round(vals[i]/mx*100)}%"></i></span><span class="mz-v">${o.dec?vals[i].toFixed(1).replace('.',','):vals[i]}</span>${o.cas?`<span class="mz-c">${MISES[i][2]==null?'—':MISES[i][2]+' %'}</span>`:''}</li>`).join('')}</ol>`}
@@ -1021,11 +1021,11 @@ function jeuEtudiant(root){
       catch(e){getSelection().selectAllChildren($('code',out));fin('Le code est sélectionné, copiez-le à la main.')}};
     out.scrollIntoView({block:'nearest'})};
   root.append(el('p','mono','Jeu d\'ouverture · TD 5, la motivation'),el('h2',null,'Les enchères de la motivation'),
-    el('p','lede','Qu\'est-ce qui vous pousse à travailler pour vos études ? Vous avez 100 points : répartissez-les entre ces dix éléments, selon ce qui compte vraiment pour vous. Il n\'y a pas de bonne réponse.'),head,list,ok,out);upd()}
+    el('p','lede','Qu\'est-ce qui vous pousse à travailler pour vos études ? Vous avez 100 points : répartissez-les entre ces onze éléments, selon ce qui compte vraiment pour vous. Il n\'y a pas de bonne réponse.'),head,list,ok,out);upd()}
 function jeuSalle(root){
   const ta=el('textarea','jeu-ta'),info=el('p','score'),res=el('div','jeu-out'),opt=el('div','row'),fam=el('button','btn ghost','Afficher les familles B / T / M'),cas=el('button','btn ghost','Comparer avec l\'enquête TopiCall');
   let F=false,C=false;ta.id='jeu-chat';ta.rows=6;ta.placeholder='Collez ici le contenu du chat, tel quel. La page ne retient que les codes MOTIV-…';
-  const calc=()=>{const all=[...ta.value.matchAll(/MOTIV((?:-\d{1,3}){10})(?![-\d])/g)].map(m=>m[1].slice(1).split('-').map(Number)),good=all.filter(a=>a.reduce((x,y)=>x+y,0)===100),n=good.length;
+  const calc=()=>{const all=[...ta.value.matchAll(/MOTIV((?:-\d{1,3}){11})(?![-\d])/g)].map(m=>m[1].slice(1).split('-').map(Number)),good=all.filter(a=>a.reduce((x,y)=>x+y,0)===100),n=good.length;
     info.textContent=n?`${n} participant${n>1?'s':''} pris en compte${all.length>n?` · ${all.length-n} code${all.length-n>1?'s':''} écarté${all.length-n>1?'s':''} (total différent de 100)`:''}`:'Aucun code pour l\'instant.';
     if(!n){res.replaceChildren();return}
     const moy=MISES.map((_,i)=>good.reduce((s,a)=>s+a[i],0)/n);let h=`<p><b>Mise moyenne par élément</b>, en points sur 100${C?' · à droite, la part de salariés de TopiCall satisfaits sur le point équivalent dans leur travail':''}</p>${barres(moy,{dec:1,fam:F,cas:C})}`;
