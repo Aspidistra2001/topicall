@@ -291,6 +291,11 @@ details.keep ul.btml{list-style:none;padding-left:0}
 .mz-c{color:var(--muted);font-size:.85rem;min-width:3.4em}
 .mz-f{display:flex;flex-wrap:wrap;gap:6px 18px}
 #v-jeu .src{font-size:.82rem;color:var(--muted)}
+.envoi{padding:8px 12px;border-left:3px solid var(--line);color:var(--muted);max-width:68ch}
+.envoi.ok{border-left-color:var(--good);background:var(--good-soft);color:var(--ink)}
+.envoi.ko{border-left-color:var(--bad);background:var(--bad-soft);color:var(--ink)}
+#v-jeu details.keep{max-width:760px}
+#v-jeu details.keep .in{padding-top:4px}
 footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-block:16px 32px}
 </style>
 
@@ -1018,36 +1023,56 @@ const JEUX={
 const FAM={B:'besoins des individus',T:'le travail lui-même',M:'système de management'};
 function barres(J,vals,o={}){const mx=Math.max(1,...vals),ord=vals.map((v,i)=>i).sort((a,b)=>vals[b]-vals[a]),it=J.items;
   return `<ol class="mz">${ord.map(i=>`<li>${o.fam?`<span class="btm btm-${it[i][1]}">${it[i][1]}</span>`:''}<span class="mz-l">${it[i][0]}</span><span class="mz-b"><i style="width:${Math.round(vals[i]/mx*100)}%"></i></span><span class="mz-v">${o.dec?vals[i].toFixed(1).replace('.',','):vals[i]}</span>${o.cas?`<span class="mz-c">${it[i][2]==null?'—':it[i][2]+' %'}</span>`:''}</li>`).join('')}</ol>`}
+/* Envoi automatique des mises : relais public ntfy.sh, un sujet par jeu et par jour (heure de Paris).
+   Message : « CODE|identifiant du navigateur ». Seule la dernière mise d'un même navigateur compte.
+   Sur la page claude.ai, les requêtes extérieures sont bloquées : le code à coller dans le chat reste le secours. */
+const RELAIS='https://ntfy.sh/',sujet=k=>'topicall-725e97d0-'+k+'-'+new Intl.DateTimeFormat('fr-CA',{timeZone:'Europe/Paris'}).format(new Date()).replace(/\D/g,'');
+function monId(){let i=null;try{i=localStorage.getItem('topicall-joueur')}catch(e){}
+  if(!i){i=Math.random().toString(36).slice(2,10).padEnd(8,'0');try{localStorage.setItem('topicall-joueur',i)}catch(e){}}return i}
 function jeuEtudiant(root,J){
-  const v=J.items.map(()=>0),tot=()=>v.reduce((a,b)=>a+b,0),head=el('p','jeu-tot'),list=el('ul','jeu-l'),ok=el('button','btn','Valider mes mises'),out=el('div','jeu-out');
+  const v=J.items.map(()=>0),tot=()=>v.reduce((a,b)=>a+b,0),head=el('p','jeu-tot'),list=el('ul','jeu-l'),ok=el('button','btn','Valider et envoyer mes mises'),out=el('div','jeu-out');
   const upd=()=>{const r=100-tot();head.textContent=r>0?`Il vous reste ${r} points à placer.`:'Vos 100 points sont placés.';ok.disabled=r!==0;
     $$('li',list).forEach((li,i)=>{$('output',li).textContent=v[i];$('.moins',li).disabled=v[i]===0;$('.plus',li).disabled=r===0})};
   J.items.forEach(([lab],i)=>{const li=el('li',null,`<span>${lab}</span><span class="pm"><button type="button" class="cat moins" aria-label="Retirer 5 points : ${lab}">− 5</button><output>0</output><button type="button" class="cat plus" aria-label="Ajouter 5 points : ${lab}">+ 5</button></span>`);
     $('.moins',li).onclick=()=>{v[i]=Math.max(0,v[i]-5);upd()};$('.plus',li).onclick=()=>{if(tot()<100){v[i]+=5;upd()}};list.append(li)});
   ok.type='button';ok.onclick=()=>{const code=J.pre+'-'+v.join('-');
-    out.innerHTML=`<p><b>Votre code</b>, à coller dans le chat de la visio :</p><p class="jeu-code"><code>${code}</code><button type="button" class="btn ghost">Copier</button></p><p class="src"></p><p><b>Vos mises, de la plus forte à la plus faible</b></p>${barres(J,v)}`;
-    const note=$('.src',out);$('button',out).onclick=()=>{const fin=m=>note.textContent=m;
+    out.innerHTML=`<p class="envoi">Envoi de vos mises à l'animateur…</p><p><b>Vos mises, de la plus forte à la plus faible</b></p>${barres(J,v)}<details class="keep"><summary>En cas de souci : le code à coller dans le chat</summary><div class="in"><p class="jeu-code"><code>${code}</code><button type="button" class="btn ghost">Copier</button></p><p class="src"></p></div></details>`;
+    const st=$('.envoi',out),dt=$('details',out),note=$('.src',out);
+    fetch(RELAIS+sujet(J.k),{method:'POST',body:code+'|'+monId()}).then(r=>{if(!r.ok)throw 0;st.classList.add('ok');st.textContent='Mises envoyées à l\'animateur. Vous pouvez les modifier et valider de nouveau : seule la dernière version compte.'})
+      .catch(()=>{st.classList.add('ko');st.textContent='L\'envoi automatique n\'a pas abouti. Copiez le code ci-dessous et collez-le dans le chat de la visio.';dt.open=true});
+    $('button',out).onclick=()=>{const fin=m=>note.textContent=m;
       try{navigator.clipboard.writeText(code).then(()=>fin('Code copié.'),()=>{getSelection().selectAllChildren($('code',out));fin('Copie refusée par le navigateur : le code est sélectionné, copiez-le à la main.')})}
       catch(e){getSelection().selectAllChildren($('code',out));fin('Le code est sélectionné, copiez-le à la main.')}};
     out.scrollIntoView({block:'nearest'})};
-  root.append(el('p','mono',J.tag),el('h2',null,J.nom),el('p','lede',J.q),head,list,ok,out);upd()}
+  root.append(el('p','mono',J.tag),el('h2',null,J.nom),el('p','lede',J.q),head,list,ok,out,
+    el('p','src','Vos mises sont envoyées sans nom, sous forme de nombres, par un service relais (ntfy.sh) qui les efface au bout de douze heures.'));upd()}
 function jeuSalle(root,J){
-  const ta=el('textarea','jeu-ta'),info=el('p','score'),res=el('div','jeu-out'),opt=el('div','row'),fam=el('button','btn ghost','Afficher les familles B / T / M'),cas=el('button','btn ghost','Comparer avec l\'enquête TopiCall'),n0=J.items.length;
-  let F=false,C=false;ta.id='jeu-chat';ta.rows=6;ta.placeholder=`Collez ici le contenu du chat, tel quel. La page ne retient que les codes ${J.pre}-…`;
-  const re=new RegExp('(?<![A-Za-z])'+J.pre+'((?:-\\d{1,3}){'+n0+'})(?![-\\d])','g');
-  const calc=()=>{const all=[...ta.value.matchAll(re)].map(m=>m[1].slice(1).split('-').map(Number)),good=all.filter(a=>a.reduce((x,y)=>x+y,0)===100),n=good.length;
-    info.textContent=n?`${n} participant${n>1?'s':''} pris en compte${all.length>n?` · ${all.length-n} code${all.length-n>1?'s':''} écarté${all.length-n>1?'s':''} (total différent de 100)`:''}`:'Aucun code pour l\'instant.';
+  const ta=el('textarea','jeu-ta'),live=el('p','envoi'),info=el('p','score'),res=el('div','jeu-out'),opt=el('div','row'),fam=el('button','btn ghost','Afficher les familles B / T / M'),cas=el('button','btn ghost','Comparer avec l\'enquête TopiCall'),raz=el('button','btn ghost','Nouvelle manche : remettre à zéro'),n0=J.items.length,
+    reChat=new RegExp('(?<![A-Za-z])'+J.pre+'((?:-\\d{1,3}){'+n0+'})(?![-\\d])','g'),reMsg=new RegExp('^'+J.pre+'((?:-\\d{1,3}){'+n0+'})\\|([a-z0-9]{4,16})$'),cle='topicall-raz-'+J.k,recus=new Map(),somme=a=>a.reduce((x,y)=>x+y,0);
+  let F=false,C=false,since='12h',vu=0,echecs=0,coupe=0;try{coupe=+localStorage.getItem(cle)||0}catch(e){}
+  ta.id='jeu-chat';ta.rows=5;ta.placeholder=`Collez ici le contenu du chat, tel quel. La page ne retient que les codes ${J.pre}-…`;
+  const calc=()=>{const auto=[...recus.values()].filter(r=>r.t>coupe).map(r=>r.v),chat=[...ta.value.matchAll(reChat)].map(m=>m[1].slice(1).split('-').map(Number)),bad=chat.filter(a=>somme(a)!==100).length,good=[...auto,...chat.filter(a=>somme(a)===100)],n=good.length;
+    info.textContent=n?`${n} participant${n>1?'s':''} pris en compte · ${auto.length} reçu${auto.length>1?'s':''} automatiquement`+(n>auto.length?` · ${n-auto.length} par le chat`:'')+(bad?` · ${bad} code${bad>1?'s':''} écarté${bad>1?'s':''} (total différent de 100)`:''):'Aucune mise pour l\'instant.';
     if(!n){res.replaceChildren();return}
     const moy=J.items.map((_,i)=>good.reduce((s,a)=>s+a[i],0)/n);let h=`<p><b>Mise moyenne par élément</b>, en points sur 100${C?' · à droite, la part de salariés de TopiCall satisfaits sur le point équivalent dans leur travail':''}</p>${barres(J,moy,{dec:1,fam:F,cas:C})}`;
     if(F)h+=`<p class="mz-f">${Object.keys(FAM).map(k=>`<span><span class="btm btm-${k}">${k}</span>${FAM[k]} : <b>${J.items.reduce((s,m,i)=>s+(m[1]===k?moy[i]:0),0).toFixed(0)}</b> points</span>`).join('')}</p>`;
     res.innerHTML=h};
-  fam.type=cas.type='button';fam.setAttribute('aria-pressed','false');cas.setAttribute('aria-pressed','false');
-  fam.onclick=()=>{F=!F;fam.setAttribute('aria-pressed',F);calc()};cas.onclick=()=>{C=!C;cas.setAttribute('aria-pressed',C);calc()};ta.oninput=calc;opt.append(fam,cas);
-  const lab=el('label','task','Le chat de la séance');lab.htmlFor='jeu-chat';
+  const releve=()=>{if(!ta.isConnected||$('#v-jeu').hidden)return;
+    fetch(RELAIS+sujet(J.k)+'/json?poll=1&since='+since).then(r=>{if(!r.ok)throw 0;return r.text()}).then(tx=>{
+      tx.split('\n').forEach(l=>{let m;try{m=JSON.parse(l)}catch(e){return}if(!m||m.event!=='message')return;since=m.id||since;vu=Math.max(vu,(m.time||0)*1000);
+        const g=reMsg.exec(String(m.message||''));if(!g)return;const a=g[1].slice(1).split('-').map(Number);if(somme(a)===100)recus.set(g[2],{v:a,t:(m.time||0)*1000})});
+      echecs=0;live.className='envoi ok';live.textContent='Réception automatique active · dernier relevé à '+new Date().toLocaleTimeString('fr-FR')+(coupe?' · manche ouverte à '+new Date(coupe).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'');calc();setTimeout(releve,8000)})
+     .catch(()=>{echecs++;live.className='envoi ko';live.textContent='Réception automatique indisponible pour l\'instant (réseau, ou page ouverte sur claude.ai). Demandez les codes dans le chat et collez-les ci-dessous.';sec.open=true;setTimeout(releve,echecs>3?30000:12000)})};
+  [fam,cas,raz].forEach(b=>b.type='button');fam.setAttribute('aria-pressed','false');cas.setAttribute('aria-pressed','false');
+  fam.onclick=()=>{F=!F;fam.setAttribute('aria-pressed',F);calc()};cas.onclick=()=>{C=!C;cas.setAttribute('aria-pressed',C);calc()};ta.oninput=calc;
+  raz.onclick=()=>{coupe=Math.max(Date.now(),vu+1);try{localStorage.setItem(cle,coupe)}catch(e){}ta.value='';calc();live.textContent='Manche remise à zéro : seules les mises envoyées à partir de maintenant comptent.'};
+  opt.append(fam,cas,raz);
+  const sec=el('details','keep','<summary>Secours : coller le chat de la séance</summary>'),inn=el('div','in'),lab=el('label',null,'Si l\'envoi automatique échoue chez un étudiant, il colle son code dans le chat : copiez le chat ici.');lab.htmlFor='jeu-chat';inn.append(lab,ta);sec.append(inn);
+  live.textContent='Connexion au relais…';
   root.append(el('p','mono','Vue de l\'animateur · à projeter en partage d\'écran'),el('h2',null,J.nom+', la salle'),
-    el('p','lede',J.salle+' : ils placent 100 points, puis collent leur code dans le chat. Copiez le chat, collez-le ci-dessous : le classement de la salle se calcule aussitôt.'),lab,ta,info,opt,res,
-    el('p','src','Rien n\'est envoyé ni enregistré : le calcul se fait dans ce navigateur. Un code collé deux fois compte deux fois.'));calc()}
-function jeu(h){const salle=h.endsWith('-salle'),k=h.replace('-salle',''),J=JEUX[k],root=$('#v-jeu');root.replaceChildren();(salle?jeuSalle:jeuEtudiant)(root,J);
+    el('p','lede',J.salle+' : ils placent 100 points et valident. Leurs mises arrivent ici d\'elles-mêmes, en quelques secondes.'),live,info,opt,res,sec,
+    el('p','src','Les mises transitent sans nom par un service relais (ntfy.sh), qui les efface au bout de douze heures. Une seule mise est comptée par navigateur : la dernière. Les réponses de la journée restent visibles jusqu\'à la remise à zéro.'));calc();releve()}
+function jeu(h){const salle=h.endsWith('-salle'),k=h.replace('-salle',''),J=JEUX[k],root=$('#v-jeu');J.k=k;root.replaceChildren();(salle?jeuSalle:jeuEtudiant)(root,J);
   const o=k==='encheres'?'emploi':'encheres',pp=el('p','src'),a=el('a',null,salle?'Ouvrir la vue des étudiants':'Vue de l\'animateur'),b=el('a',null,'Autre jeu : '+(o==='emploi'?'le premier emploi':'les études'));
   a.href='#'+(salle?k:k+'-salle');b.href='#'+o+(salle?'-salle':'');pp.append(a,' · ',b);root.append(pp)}
 function route(){
